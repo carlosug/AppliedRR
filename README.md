@@ -1,4 +1,8 @@
-# Tutorial Introduction to R
+# Workshop: Introduction to R
+Lianne Ippel (last version modified by C. Utrilla Guerrero)
+April 15, 2020
+Course: VSK1004 Applied Researcher
+
 
 
 ![](./pics/venlorlogo.PNG)
