@@ -24,7 +24,7 @@ The command language for R is a computer programming language but the syntax is 
 Source: [https://en.wikipedia.org/wiki/R_(programming_language)](https://en.wikipedia.org/wiki/R_(programming_language))
 
 
-## Obtaining and instaling R and Rstudio
+## Obtaining and installing R and Rstudio
 
 R can be downloaded directly from CRAN: [https://cran.r-project.org/](https://cran.r-project.org/) afterwhich you can install Rstudio Desktop: [https://rstudio.com/products/rstudio/download/](https://rstudio.com/products/rstudio/download/) (follow the instructions for installation).
 
@@ -54,11 +54,9 @@ _Resources_: [https://rstudio.com/resources/cheatsheets/](https://rstudio.com/re
 + Stackoverflow community: [https://stackoverflow.com/](https://stackoverflow.com/)
 
 
-
-
 ## Starting playing with R
 
-First thing first, we need to make sure that we will remember the purpose of this script and when it was created. We do that using the `#' symbol, as follows:
+First thing first, we need to make sure that we will remember the purpose of this script and when it was created. We do that using the `#` symbol, as follows:
 
 ```{r}
 # author: Lianne Ippel (but please fill out your own name here)
