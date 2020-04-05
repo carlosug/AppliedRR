@@ -6,6 +6,7 @@
 
 - **April 15, 2020**
 
+### [The Final assignment(s) are here]('/inputs/Assignments-tutorial-1.docx')
 
 
 
@@ -67,5 +68,4 @@ First thing first, we need to make sure that we will remember the purpose of thi
 
 Now that we know what is this, see hello to everybody! To execute this code, select/highlight the piece of code you want to run and either press `Ctrl Enter` or click `Run` in the upper right corner of the script. 
 
-### [Final the assignment here]('./inputs/Assignments-tutorial-1.docx')
 
