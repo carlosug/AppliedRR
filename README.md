@@ -6,7 +6,7 @@
 
 - **April 15, 2020**
 
-### [The Final assignment(s) are here]('/inputs/Assignments-tutorial-1.docx')
+### [The Final assignment(s) are here]('inputs/Assignments-tutorial-1.docx')
 
 
 
