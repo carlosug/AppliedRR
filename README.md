@@ -6,7 +6,7 @@
 
 - **April 15, 2020**
 
-### [The Final assignment(s) can be downloaded here](inputs/Assignments-tutorial-1.docx)
+### [The Final assignment(s) can be downloaded here](https://github.com/carlosug/AppliedRR/raw/master/inputs/Assignments-tutorial-1.docx)
 
 
 
