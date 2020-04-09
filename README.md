@@ -38,8 +38,6 @@ R studio is an interface of R and using these exercises you will learn how to wo
 
 Reference cards are great ways to help you discover new functions, and remember old ones.
 Don't feel overwhelmed (even we don't use half of these functions).
-The printed cheatsheets are yours to keep!
-
 
 General R Basics:
 
