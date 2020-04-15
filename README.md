@@ -6,7 +6,13 @@
 
 - **April 15, 2020**
 
-### [The Final assignment(s) can be downloaded here](https://github.com/carlosug/AppliedRR/raw/master/inputs/Assignments-tutorial-1.docx)
+### :earth_africa: AIM
+
+The aim of this workshop is enable you to thoughtfully and actively use R. You will learn the fundamentals of the R language, as well as cutting-edge packages for wrangling, analyzing, and communicating statistical data.
+
+### [The Final assignment(s) can be downloaded here](inputs/Assignments-tutorial-1.docx)
+
+### [The solutions will be stored here](inputs/Assignments-tutorial-1-sol.html)
 
 
 
@@ -56,7 +62,6 @@ _Resources_: [https://rstudio.com/resources/cheatsheets/](https://rstudio.com/re
 
 + Google
 + Stackoverflow community: [https://stackoverflow.com/](https://stackoverflow.com/)
-
 
 ## Starting playing with R
 
