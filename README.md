@@ -12,7 +12,7 @@ The aim of this workshop is enable you to thoughtfully and actively use R. You w
 
 ### [The Final assignment(s) can be downloaded here](inputs/Assignments-tutorial-1.docx)
 
-### [The solutions will be stored here](inputs/Assignments-tutorial-1-sol.html)
+### [The solutions will be stored here](-inputs/Assignments-tutorial-1-sol.html)
 
 
 
