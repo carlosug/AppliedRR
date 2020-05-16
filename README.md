@@ -6,7 +6,7 @@
 
 - **April 15, 2020**
 
-### :earth_africa: AIM
+### AIM
 
 The aim of this workshop is enable you to thoughtfully and actively use R. You will learn the fundamentals of the R language, as well as cutting-edge packages for wrangling, analyzing, and communicating statistical data.
 

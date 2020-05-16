@@ -1,0 +1,772 @@
+---
+title: 'Applied Research: Descriptive with R'
+author: "Carlos Utrilla Guerrero"
+date: "4/13/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+![](./pics/logo campus.jpg)
+
+# WELCOME
+
+Welcome to the workshop number 2: Introduction to stats with R. 
+
+
+## Learning outcomes:
+
+By the end of this assignment(s), we should be able to:
+
+- Read in your own data with different methods.
+- Explore your data with summary statistics.
+- Create graphs for exploring your data.
+- Create your own functions. (bonus)
+
+## Essential R assignment(s) document guidelines:
+In the current document you will find the following color(s) highlight(s) and format(s). Please refer to this table for legend description.
+
+## Dataset
+In this assignment(s), we will use the following dataset:
+
+1. `Workshop Statistics_ descriptives .xlsx`.
+
+
+## Download the dataset
+For this session, make sure to download and save the datasets in `.xlsx`.
+Please save the Excel file in a folder that you will use for this practical (e.g. `workshop/data/`).
+
+### Setup your working directory
+Once you have your dataset saved in Excel, you still need to set your working directory in R. 
+
+To do this, try to find out first where your working directory is set at this moment:
+
+```{r}
+getwd()
+```
+
+By executing this command, R now knows exactly in which folder you're working. Ideally, the output of this code is the location of your Excel file.
+
+### Read into R
+
+We can do it in two main ways:
+
+- 1. Basic R commands using `readxl` package
+
+This is a package that you can use to load in Excel files in R. You will need to install the package as following:
+
+```{r}
+#install.packages("readxl")
+library(readxl)
+```
+
+
+```{r}
+mydat1 <- read_xlsx('Workshop Statistics_ descriptives .xlsx')
+
+```
+
+- 2. Using graphical user interface
+
+It might be also an option for you to get help of R studio, with no code at all. For this propose, you can go to:
+
+`file -> import Dataset -> excel -> _select your file_ -> import`
+
+Nevertheless, we have another way to read the file directly from google sheet. It doesn't need to be downloaded the file since it imports into R. If you want to learn more about it, here is one way:
+
+- Install `gsheet` package:
+
+```{r}
+#install.packages("gsheet")
+library(gsheet)
+```
+
+- Copy and paste the url of the google docs. Then Create a object `url` to store the information
+```{r}
+url <- 'https://docs.google.com/spreadsheets/d/1JchKI5u-I5IcWbnM_JpMkMJIZX1012oJVoIEZz2ra3c/edit#gid=0'
+```
+
+```{r}
+mydat <- gsheet2tbl(url)
+```
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+
+## Understanding a data frame
+
+First thing first, we need to make sure that we correctly imported the dataset. Use the `View()` to look the entire dataframe in new windows.  
+```{r}
+View(mydat)
+```
+
+Use the code `print()` to print the entire dataframe in the console
+```{r}
+print(mydat) # printing all dataset with NA
+```
+
+
+Use the code `head()` and `tail()` to print top and bottom dataframe respectively.
+
+```{r}
+head(mydat)
+tail(mydat,5) # last five observations
+```
+
+
+It is time to make our first diagnostic of the dataset. We can receive a reasonably set of information per variable running the following code:
+```{r}
+str(mydat)
+```
+
+Alrighty, the data contains 74 observations and 8 different variables. Firstly,  the name of the variables seems to be very large and it requires to be re-named in we want to make this dataset ready for further explorations. In addition, we can notice that the amount of empty responses and -99 are considerably high. We can also see that all of variables, except `favourite pet` variable, are considered `numeric` variable. Indeed, it might be worth to convert favourite pet into a `dummy` variable. It is therefore time to wrangling the data, and clean it a little bit!
+
+## Data cleaning
+
+Perform some modification to the dataset in order to tune it and get ready for further data analysis.
+
+*N.B.*: It is a good practice to always save the original dataset before starting to make further steps. Please type the following:
+
+```{r}
+mydat_original <- mydat
+print(mydat1)
+
+# look at the structure of your data
+str(mydat)
+
+```
+
+### Change column names
+
+Firstly, diplay the column names with `names()` function:
+```{r}
+names(mydat)
+```
+
+Last three columns are inconveniently named. Using `names()` with specific position will change the name of these columns. Be sure to select properly the elements of the vector. 
+
+The name of column `favourite pet: cat(=1) or dog (=2)` is very long. We can make it shorter!
+Rename it to `favPet`. The position of this column is 6. Then the command will be as following:
+
+```{r}
+# change the name col 6
+names(mydat)[6] <- "favPet"
+```
+
+Do you want to change the name of more than one column at the same time? Use the following command to replace the last two column names to `GoT` and `LotR`, respectively.
+
+
+```{r}
+names(mydat)[7:8] <- c('GoT','LotR')
+```
+
+
+#### Exercise 1: Check/listlist the variable names in our data set. Have the variable names of column 6 through 8 been successfully changed?
+
+```{r}
+names(mydat) # yes
+```
+
+### Missing data
+
+Dataframes are not always complete. Consequently, we have to deal with missing values. You have to identify values as missing if your dataframe isn’t complete because you do not want them to be included in your analysis. In the current dataframe (mydat), missings have been coded as -99 (which is usually the code given to a “missing value”). In R, we need to convert all these records to NA. 
+
+```{r}
+mydat$GoT[mydat$GoT == -99] <- NA
+mydat$LotR[mydat$LotR == -99] <- NA
+```
+
+Check one of the variable if it represents a missing value
+```{r}
+is.na(mydat$GoT) # Check one of the variable if it represents a missing value
+```
+
+Check again, first 6 rows of the data set
+
+```{r}
+head(mydat,6)
+```
+
+It looks like ‘Unknown’ values within tutor variable are missing values. But they still have to be identified as such.
+
+#### Exercise 2: Could you convert all these records into `NA`?
+_Intructions_: `[mydat == -99]` should be now `[mydat == 'unknown']`
+
+
+```{r}
+mydat$age[mydat$age == -99] <- NA
+mydat$length[mydat$length == -99] <- NA
+mydat[mydat == -99] <- NA
+```
+
+
+### Dummy variables:
+
+Dummy variables (or binary variables) are a specific type of categorical variable. They have only two values (0 = an event hasn’t occurred; 1 = an event occurred). Dummy variables are commonly used in statistical analyses and in more simple descriptive statistics. A dummy column is one which has a value of one when a categorical event occurs and a zero when it doesn’t occur. Indeed, we want to modify the variable `favPet` to a dummy variable. 
+Specifically, we want the variable `favPet` to say whether we have seen a dog (=1) or not (=0; thus a cat). In this case, value 0 takes when is ‘cat’. Otherwise value 1.
+
+Here you can see how to convert the value 1 for cat too value 0 when it is a cat.
+```{r}
+
+# check my data
+str(mydat)
+
+```
+
+If you `view` the data now, you will notice that values are 0 and 2 in `favPet` column. So we are almost done!
+
+#### Exercise 3: Can you convert `favPet` outcome to 1 when is a `dog (=2)`?
+```{r}
+mydat$favPet[mydat$favPet==1] <- 0
+mydat$favPet[mydat$favPet==2] <- 1
+```
+
+
+Please, always check the new modifications out in the console.
+
+#### Exercise 4: Can you please return the last 10 records of `mydat`?
+Forgot how? Check out exploration of data again.
+
+```{r}
+# show an example 10 recods
+tail(mydat$favPet,10)
+```
+
+#### Exercise 5: Can you please return the first 15 records of the column `favPet` from `mydat`? You should see a set of 1 and 0 values.
+
+```{r}
+head(mydat$favPet,15)
+```
+
+### Factor Variable
+Factors are used to store categorical data. They are important for statistical modeling (analysis), since categorical variables are treated differently in statistical models than continous variables. This ensures categorical data is treated accordignly in our statistical analysis and data visualisation. Factors are the data objects which are used to categorize the data and store it as labels. It seems like we need also `favPet` to be treated as a `factor` since we might be interested in making some graphs at a later stage.
+
+Now we can check if the variable `favPet` is a factor variable.
+
+```{r}
+# check if factor
+is.factor(mydat$favPet)
+```
+
+Well, it returns FALSE. Indeed, we have seen before that `favPet` is a numeric. The most common numeric types in R are integrers and doubles. You can explore which type of numeric type with`typeof()`
+
+
+```{r}
+class(mydat$favPet)
+```
+
+Now it is time to convert it into a `factor` variable. The first label ‘cat’, will correspond to favPet=0 and the second label ‘dog’, will correspond to favPet=1 because the order of the labels will follow the numeric order of the data (which in this case is 0, 1).
+
+```{r}
+mydat$favPet <- factor(mydat$favPet, labels = c('cat','dog'))
+
+```
+
+We can check our new modifications now:
+```{r}
+str(mydat$favPet)
+
+# select variable favPet using $
+mydat$favPet
+```
+
+#### Exercise 5: Can you please return the record number 12 of the column `favPet` from `mydat`? You should see whether she/he answered pet or dog.
+
+```{r}
+mydat$favPet[12]
+```
+
+To illustrate the usefulness of the factor variables, we can create a `table()` like this
+
+```{r}
+table(mydat$year, mydat$favPet)
+```
+Tables are much easier to interpret when using factor variables because they add useful labels to the table and they arrange the factors in a more understandable order.
+
+#### Exercise 7: Could you please briefly interpret the results of the above `table(mydat$year, mydat$favPet)`? What are your conclusions based on the above table? Write down in 2-3 sentences.
+
+
+#### Exercise 8: Could you create another table that shows the distribution of `favPet` responses among tutor's name?
+
+```{r}
+table(mydat$tutor, mydat$favPet)
+```
+
+
+## Data filtering
+
+Let's assume we are interesting on exploring responses only for the year 2020, how would you do that? We can use `filter()` function from `dpyyr`. We therefore need to install it:
+
+```{r}
+# The filter function is at dplyr package
+#install.packages("dplyr")
+library(dplyr)
+```
+
+
+Now, we can create a subset of mydat dataset. Lets filter the data for the year 2020
+```{r}
+# Return rows only that meet one condition (e.g. year 2020)
+mydat2020 <- filter(mydat, year == '2020')
+```
+
+You can also use the `filter()` verb to set two conditions, which could retrieve a single observation.
+
+Filtering for one favourite pet and one year:
+```{r}
+mydat2019cats <- filter(mydat, year == '2019',favPet == 'cat')
+```
+
+
+#### Exercise 9: Filter `mydat` dataset for only records within tutor name = Koen.
+Instructions: 1. create an object `mydatkoen` 
+              2. assign `<- filter(mydat, mydat$(here tutor column) == '')`
+
+```{r}
+mydatkoen <- filter(mydat,tutor == 'Koen')
+```
+
+At this point, we have successfully completed our goal of handling data quality issues such as missing values, transforming data types and dummy variables. Now, it is time to explore the data.
+
+### Exploring the dataset.
+
+We first need to compute some measures for the variables in our dataset. In this section, we will go deeply into summary statistics such as mean, variance and standard deviation. 
+
+
+Like Workshop1, lets try to calculate the mean of one variable. Let's take the mean of variable `age` as following:
+
+```{r}
+mean(mydat$age)
+```
+
+It returns NA.
+
+#### Exercise 10: Can you calculate the mean of `length`?
+
+```{r}
+mean(mydat$length) # It also returns NA.
+```
+
+An important takehome is that `mean()` function will return NA if you have missing values on your dataset. Make sense right? Indeed, using `mean()` with no specification dealing with NA will not return the mean.
+
+If you type on your console `?mean()` you will find further information in relation to `NA`.
+
+
+Thus, in order to calculate the mean, we need to add `na.rm = TRUE`on `mean()` function. At the moment we will just indicate to R to drop the NA values from the calculations.
+
+```{r}
+mean(mydat$age, na.rm = TRUE)
+```
+
+
+#### Exercise 11: Can you please calculate the `mean()` of variable `length`? 
+Remember to tell mean function to deal with NA values.
+
+```{r}
+mean(mydat$length, na.rm = TRUE)
+```
+
+So roughly we can say that the age and length average for students along 2019 and 2020 is 21 year old and 1,70 mts, recepectively.
+
+A good point of using R is that instead of using separate functions, you can use the `summary( )` function to print descriptive statistics from each column in mydat.
+
+For instance, the summary statistics for all our variables:
+
+```{r}
+summary(mydat)
+```
+
+Or just one variable:
+
+```{r}
+summary(mydat$age)
+```
+Nonetheless, if you look at results, neither the variance nor standard deviation appears. We need to have this information because, in short, it tells us something about the spread of observations around the mean. We will have to calculate the variance and standard deviation separately and will do so for the age and length variables. 
+
+Here is our variance for age:
+
+```{r}
+var(mydat$age)
+```
+
+Again NA result. Please bear in mind the NA for future calculations:
+
+```{r}
+var(mydat$age, na.rm= TRUE)
+```
+
+Here is our standard deviation for age. Now we know what exactly we need to add on it, NA!:
+
+```{r}
+sd(mydat$age, na.rm = TRUE)
+```
+
+#### Exercise 12: Can you please calculate the `var()` and `sd()`of variable `length`? 
+
+```{r}
+var(mydat$length, na.rm = TRUE)
+sd(mydat$length, na.rm = TRUE)
+```
+
+
+Likewise, we can use `summarize()` function to print together all this statistics such as `var` or `stdv` for one specific variable, for instance, `age`. 
+
+So, what are the average, variance and standard deviation for age variable?
+
+```{r}
+summarize(mydat, mean_age = mean(mydat$age, na.rm = TRUE),
+          var_age = var(mydat$age, na.rm = TRUE),
+          stdv_age = sd(mydat$age, na.rm = TRUE))
+```
+
+In the output, we see the answer to our question: the mean age is about 21.64 year. If you think about this, it does make more sense if we can ask questions about averages in a particular year within a specific group.
+
+To answer this, you can combine `summarize()` and `filter()` function.
+
+```{r}
+summarize(filter(mydat, year == 2019),
+          mean2019 = mean(age, na.rm = TRUE))
+```
+That output shows you the average age in the year 2019 was about 22,22 year old.
+
+But you can of course summarize into multiple columns. Let's suppose that along with finding the average age, you want to find the total number of students in 2019
+
+```{r}
+summarize(filter(mydat, year == 2019),
+          mean2019 = mean(age, na.rm = TRUE),
+           median2019 = median(age, na.rm = TRUE))
+```
+You've seen how to find the mean and median `age` across a set of observations.
+
+#### Exercise 12: Can you find the mean and median of length variable across 2020? 
+Use the following instruction for the exercise:
+`summarize(filter(mydat, year == ""),`
+          `mean2020 = mean("", na.rm = TRUE),`
+           `median2020 = median("", na.rm = TRUE))`
+
+```{r}
+summarize(filter(mydat, year == 2020),
+          mean2020 = mean(length, na.rm = TRUE),
+           median220 = median(length, na.rm = TRUE))
+```
+
+You've seen how to find the mean and median `age` and `length` across a set of observations.
+
+To sum up, using `summary` as before, R return as output the statistics of all the dataset. Instead, `filter` and `summarize` compute a specific measurement in a specific subset of your data.
+
+Great! We already consolidated concepts from last workshop: mean, variance and standard deviation. 
+We have used R functions and they are cool. Now it its time for making our graphs!
+However, for challengers whose want to make their own functions please go ahead and make the bonus section before the visualisation section!
+
+## Visualising descriptive statistics
+
+We are just about to finish. Please make last effort and lets make great graphs!
+
+### Barplot
+If you recall from exercice 7 and 8 from factor section, we created two tables in which rows indicate `year` and `tutors` and columns indicating `FavPet` labels (dog/cat).
+
+Instead of just priniting the table, you might want to represent the summary visually. For that, we can use `barplot`.This kind of plot represent the data using one bar each year, with the height and colour of the bar representing the `favPet` variable.
+
+
+```{r}
+barplot(table(mydat$favPet, mydat$year), ylab = 'number of respondents', xlab = 'Years',legend = c('dog','cat'))
+```
+
+#### Exercise 13: Can you create a barplot representing the `tutor names` on the bars?
+
+```{r}
+
+class(mydat$tutor)
+mydat$tutor <- as.factor(mydat$tutor)
+barplot(table(mydat$favPet, mydat$tutor), ylab = 'number of respondents', xlab = 'Tutors', legend = c('dog','cat'))
+```
+
+### Boxplot
+Let’s assume you want to get a visual representation of your dataset, focusing particularly on the distribution/spread of `age` and `length`. boxplots fit your aim perfectly.
+
+What is a boxplot? A boxplot is a standardized way of displaying the distribution of data based on a five number summary (“minimum”, first quartile (Q1), median, third quartile (Q3), and “maximum”). It can tell you about your outliers and what their values are. It can also tell you if your data is symmetrical, how tightly your data is grouped, and if and how your data is skewed.
+Need additional explanation? Consult e.g. the following source:
+
+https://www.dummies.com/education/math/statistics/what-a-boxplot-can-tell-you-about-a-statistical-data-set/
+
+```{r}
+boxplot(mydat$age, main = 'Age distribution', ylab = 'Age')
+boxplot(age~year,mydat, main = 'Age distribution', ylab = 'Age')
+```
+
+#### Exercise 14: Could you please explain me what this point portriated on the graph means?
+
+### Histograms
+
+```{r}
+hist(mydat$age,
+     breaks = 15, # suggests 15 bins
+     main = paste('Histogram of Age Distribution of age',
+                  'Annual  Years 2018 and 2020'),
+     xlab = 'age', ylab = 'Frequency',
+     col = 'thistle1')
+hist(mydat$length,
+     breaks = 15,
+     main = 'Distribution of length', xlab = 'length', ylab = 'Frequency', col = 'red')
+
+```
+
+
+#### Exercise 15: Could you plot the descriptive of the `length` variable?
+
+```{r}
+boxplot(mydat$length, main = 'Length distribution', ylab = 'length')
+```
+
+
+#### Exercise 16: Now that you have explored both variables, age and length, how do they differ in terms of data distribution?
+
+So far we only have learnt about the distribution of one variable. What if we portrait the `age` with the `favPet` variables in a boxplot?
+
+```{r}
+boxplot(age ~ favPet, data = mydat)
+?boxplot
+```
+
+
+
+Let's make it a little bit more funcy. It is just matter of colors!:
+
+```{r}
+boxplot(age ~ favPet, data = mydat, main = "Survey Data", xlab = "Favourite Pet", ylab="Age", col = (c('blue','red')))
+```
+
+#### Exercise 17: Which favourite pet did the oldest person choose in the dataset?
+
+
+#### Exercise 18: As in the last graph, could you create another boxplot that shows the distribution of `favPet` responses and `lenght` variable?
+
+```{r}
+boxplot(length ~ favPet, data = mydat, main = "Survey Data", xlab = "Favourite Pet", ylab="Length", col = (c('blue','red')))
+
+```
+
+
+
+### Scatterplot
+
+Another visualization of data is provided by a scatterplot. We now can go ahead and create scatterplot that allow us to find whether or not there are relationships between variables, which that might suggest the need for further investigations.
+
+Let's look at a scatterplot of lotR fanship nd GoT fanship: 
+
+```{r}
+plot(x = mydat$LotR, y = mydat$GoT)
+```
+
+
+How can you add a title to the plot? Change labels of the x and y axes? 
+
+```{r}
+a <- c(mydat$LotR, mydat$GoT)
+a
+plot(mydat$LotR, mydat$GoT,
+     main= 'My main Title',
+     xlab = 'X axis label',
+     ylab = 'Sub-title description',
+     col.lab = 'blue')
+
+
+
+```
+
+#### Exercise 19: Can you create a graph that shows the relationship between the variables `age` and `length` in mydat `datset`? Give some interpretations about the nature of the relationship between these two variables.
+
+```{r}
+plot(mydat$length, mydat$age)
+```
+
+
+You want to know how to make it fancier/ better?. Install the ggplot2 package and try it out!:
+
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+ggplot(mydat, aes(x = length, y = age, color = favPet)) + geom_point()
+```
+
+
+
+## Bonus section: 
+
+### From preprocessing data of research paper:Human Origin, the evolution of modern human in Europe
+
+```{r}
+library(gsheet)
+url <- 'https://docs.google.com/spreadsheets/d/1F6vp2tA3Q1FuFCOtw0d5XeZvJWRtEbg9chpmjKOtROQ/edit?ts=5ea70851#gid=2097240761'
+if(requireNamespace('readr', quietly=TRUE)){
+library(readr)
+humano <- read_csv(construct_download_url(url),trim_ws = T)
+}
+
+head(humano, 10)
+
+
+```
+
+Convert to factor the groups
+
+```{r}
+summarize(filter(humano, Group == 'Yukagir'),
+          mean = mean(PC1, na.rm = TRUE),
+          count = sum(humano$Group == 'Yukagir'))
+```
+
+
+```{r}
+humano$Group <- as.factor(humano$Group)
+library(ggplot2)
+ggplot(humano, aes(x = PC1, y = PC2, color = Group)) + geom_point()
+
+
+
+plot(humano$PC1, humano$PC2,col = humano$Group,
+     main= 'Human Origin',
+     xlab = 'PC1',
+     ylab = 'PC2',
+     col.lab = 'black')
+```
+
+### Machine Learning Repository
+https://archive.ics.uci.edu/ml/datasets.php
+
+```{r}
+iris.uci <- read.csv(url("http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"), header=FALSE, col.names=c("sepal.length","sepal.width","petal.length","petal.width","species"))
+
+iris.uci1 <- read_excel("irisdataset.xlsx")
+library(datasets)
+data(iris)
+summary(iris.uci)
+str(iris.uci)
+str(iris.uci1)
+library(dplyr)
+str(iris$Sepal.Length)
+hist(iris.uci1$Sepal.Length)
+
+
+
+boxplot(sepal.length ~ species, data = iris.uci, main = "Iris Data", xlab = "length", ylab="Species", col = (c('blue','red','green')))
+
+ggplot(data = iris.uci,aes(x = petal.length, y = petal.width, colour = species)) + 
+      geom_point()
+
+```
+
+### Open data from ECDC COVID19
+
+```{r}
+#install.packages("utils")
+library(utils)
+data <- read.csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", na.strings = "", fileEncoding = "UTF-8-BOM")
+library(dplyr)
+str(data)
+Europe <- filter(data, dateRep == "05/05/2020", continentExp == "Europe")
+plot(Europe$deaths, Europe$cases, col = Europe$countriesAndTerritories)
+ggplot(Europe, aes(x = deaths, y = cases, color = countriesAndTerritories)) + geom_point()
+
+
+```
+
+
+```{r}
+url1 <- "https://raw.githubusercontent.com/carlosug/AppliedRR/master/data/trial_ACTG175.csv"
+ACTG175 <- read.delim(url1,dec = '.',sep = ',')
+
+str(ACTG175)
+summary(ACTG175)
+
+ggplot(data = ACTG175, mapping = aes(x = age, y = cd4_baseline)) + 
+      geom_point(alpha = .2, col = "darkblue") +
+  labs(title = "ACTG175 Trial",
+       subtitle = "Baseline age and CD4 T cell count at baseline ",
+       x = "Age (age)",
+       y = "CD4 T cell count at baseline (cd4_baseline)")
+
+```
+
+
+### Writting our own functions
+
+At some point, you will want to write a function, and it will probably be sooner than you think. Functions are core to the way that R works, and the sooner that you get comfortable writing them, the sooner you’ll be able to leverage R’s power, and start having fun with it.
+
+We will learn how to create functions for `mean`, `variance` and `standard deviation`. This section is particularlly tricky since our dataset is full of `NA`. Then, the code will be a little bit more complex than usual:
+
+Start by writting the mean_age function into your script:
+```{r}
+my_mean <- function(x) {
+  n = length(x[!is.na(x)])
+  average <- sum((x),na.rm = TRUE)/n
+  return(average)
+}
+my_mean(mydat$age)
+```
+In order to check whether your own function works properly, compare your results to with the `mean()` function alike:
+
+```{r}
+my_mean(mydat$age) == mean(mydat$age, na.rm = TRUE)
+```
+If you get `TRUE` then means we are doing very well.
+
+#### Exercise Bonus: Can you use our function called `my_mean()` to compute the `length` mean and check if you get same results as with `mean(mydat$length, na.rm = TRUE)`?.
+
+```{r}
+my_mean(mydat$length)
+```
+
+```{r}
+my_mean(mydat$length) == mean(mydat$length, na.rm = TRUE)
+```
+
+Then, we will perform similar work for variance and standard deviation.
+
+For the variance:
+```{r}
+my_var <- function(x){
+  n <-length((x[!is.na(x)]))
+  m <-mean(x, na.rm = TRUE)
+  (1/(n - 1)) * sum((x - m)^2, na.rm = TRUE)
+}
+
+
+```
+
+#### Exercise Bonus: Can you use our function called `my_var()` to compute the `length` variance and check if you get same results as with `var(mydat$length, na.rm = TRUE)`?.
+
+```{r}
+my_var(mydat$length)
+
+my_var(mydat$length) == var(mydat$length, na.rm = TRUE)
+```
+
+Now that you already master how to write functions, do make similar work for the standard deviation.
+
+#### Exercise Bonus: Write your own function that computes the standard deviation of `age` in the `mydat` data set. Remember to add specification for dealing with NA:
+
+Solution with NA:
+
+```{r}
+sd(mydat$age, na.rm = TRUE)
+```
+
+
+```{r}
+# standard deviation
+
+my_stdv <- function(x){
+  n <- length((x[!is.na(x)]))
+  m <- mean(x, na.rm = TRUE)
+  v <- sum((x-m)^2,na.rm = TRUE)/(n-1)
+  sqrt(v)
+}
+my_stdv(mydat$age)
+```
+
+Well done! You have done one of the most challenging part of R.
