@@ -34,7 +34,7 @@ The chapter numbers are relevant chapters from the excellent (and freely availab
 # Statistical Analysis
 | Tutorial | Core packages / functions |
 |----|---|
-| [Basic statistics]() | stats: lm, aov, t.test |
+| [Basic statistics](inputs/Assignment-2.html) | stats: lm, aov, t.test |
 | [Advanced statistics overview]() | stats: glm, lme4: lmer, glmer |
 | [Generalized linear models]() | stats: glm, family, sjPlot: tab_model, plot_model |
 | [Multilevel Models]() | lme4: lmer, glmer, sjPlot: tab_model, plot_model |
