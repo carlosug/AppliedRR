@@ -13,7 +13,7 @@ Below we list the relevant handouts/tutorials.
 
 | Lecture | Day | Description |
 |----|---|---|
-|[Lecture 1](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 13 May 2020 | Introduction to Stats with R |
+|[Basic statistics](inputs/Assignment-2.html) | 13 May 2020 | Introduction to Stats with R |
 |[Lecture 2](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 13 June 2020 | TBD |
 |[Lecture 3](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 15 June 2020 | TBD |
 |[Lecture 4](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 17 June 2020 | TBD |
