@@ -9,7 +9,14 @@ Below we list the relevant handouts/tutorials.
 
 ![](./pics/venlorlogo.PNG)
 
+# Lectures
 
+| Lecture | Day | Description |
+|----|---|---|
+[Lecture 1](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 13 May 2020 | Introduction to Stats with R |
+[Lecture 2](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 13 June 2020 | TBD |
+[Lecture 3](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 15 June 2020 | TBD |
+[Lecture 4](inputs/lectures/UCV Workshop_ introduction to statistics.pdf) | 17 June 2020 | TBD |
 
 # R Basics
 
@@ -36,9 +43,6 @@ The chapter numbers are relevant chapters from the excellent (and freely availab
 | [Visualizing Data]() | 3 & 7 | ggplot2  |
 
 # Reference cards
-
-Reference cards are great ways to help you discover new functions, and remember old ones.
-Don't feel overwhelmed (even we don't use half of these functions).
 
 General R Basics:
 
