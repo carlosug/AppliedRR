@@ -43,24 +43,12 @@ The chapter numbers are relevant chapters from the excellent (and freely availab
 | [Combining (merging) Data]() | 13 | dplyr: inner_join, left_join, etc. | 
 | [Basic string (text) handling]() | 14 | readr: str_detect, str_extract etc., iconv |
 
-
-# Reference cards
-
-Reference cards are great ways to help you discover new functions, and remember old ones.
-Don't feel overwhelmed (even we don't use half of these functions).
-
 General R Basics:
 
 + [https://cran.r-project.org/doc/contrib/Short-refcard.pdf](https://cran.r-project.org/doc/contrib/Short-refcard.pdf)
 + [https://www.stats.ox.ac.uk/~snijders/siena/Rrefcard.pdf](https://www.stats.ox.ac.uk/~snijders/siena/Rrefcard.pdf)
 + [http://www.u.arizona.edu/~kuchi/Courses/MAT167/Files/R-refcard.pdf](http://www.u.arizona.edu/~kuchi/Courses/MAT167/Files/R-refcard.pdf)
 + [http://www.i3s.unice.fr/~malapert/R/pdf/base-r.pdf](http://www.i3s.unice.fr/~malapert/R/pdf/base-r.pdf)
-
-RStudio Guide:
-
-+ [http://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf](http://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf)
-
-_Resources_: [https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/)
 
 # Where to ask?
 
