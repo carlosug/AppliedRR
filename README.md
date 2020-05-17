@@ -32,12 +32,16 @@ The chapter numbers are relevant chapters from the excellent (and freely availab
 | [Basic string (text) handling]() | 14 | readr: str_detect, str_extract etc., iconv |
 
 # Statistical Analysis
-| Tutorial | Core packages / functions |
-|----|---|
-| [Basic statistics](tutorials/simple_modeling.md) | stats: lm, aov, t.test |
-| [Advanced statistics overview](tutorials/advanced_modeling.md) | stats: glm, lme4: lmer, glmer |
-| [Generalized linear models](https://htmlpreview.github.io/?https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/generalized_linear_models.html) | stats: glm, family, sjPlot: tab_model, plot_model |
-| [Multilevel Models](https://htmlpreview.github.io/?https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/multilevel_models.html) | lme4: lmer, glmer, sjPlot: tab_model, plot_model |
+
+| Tutorial | R4DS chapter(s) | Core packages / functions |
+|----|---|---|
+| [R Basics](inputs/Assignments-tutorial-1-sol.html) | 4 | (base R functions) |
+| [Transforming Data]() | 5 | dplyr: filter, select, arrange, mutate | 
+| [Summarizing Data]() | 5 | dplyr: group_by, summarize |
+| [Visualizing Data]() | 3 & 7 | ggplot2  |
+| [Reshaping data]() | 12 | tidyr: spread, gather |
+| [Combining (merging) Data]() | 13 | dplyr: inner_join, left_join, etc. | 
+| [Basic string (text) handling]() | 14 | readr: str_detect, str_extract etc., iconv |
 
 
 # Reference cards
