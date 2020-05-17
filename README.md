@@ -30,7 +30,7 @@ The chapter numbers are relevant chapters from the excellent (and freely availab
 
 | Tutorial | Core packages / functions |
 |----|---|
-| [Basic statistics](tutorials/simple_modeling.md) | stats: lm, aov, t.test |
+| [Basic statistics](inputs/Assignments-2.html) | dplyr: filter, summarize |
 | [Transforming Data]() | 5 | dplyr: filter, select, arrange, mutate | 
 | [Summarizing Data]() | 5 | dplyr: group_by, summarize |
 | [Visualizing Data]() | 3 & 7 | ggplot2  |

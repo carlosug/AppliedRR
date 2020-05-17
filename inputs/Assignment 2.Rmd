@@ -1,13 +1,16 @@
 ---
-title: 'Applied Research: Descriptive with R'
+title: 'Applied Research: Intro Statistics with R'
 author: "Carlos Utrilla Guerrero"
 date: "5/13/2020"
 output:
-  html_document:
-    df_print: paged
-  pdf_document: default
-  word_document: default
+ html_document: default
+urlcolor: blue
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](../pics/venlorlogo.png)
 
 # WELCOME
 
