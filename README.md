@@ -16,20 +16,6 @@ Below we list the relevant handouts/tutorials.
 * [Getting started](tutorials/R_basics_1_getting_started.md) ([shorter version](tutorials/R_basics_1_getting_started_short.md))
 * [Data and functions](tutorials/R_basics_2_data_and_functions.md) ([practise template](practise/R_basics_2_data_and_functions_practise.Rmd))
 
-# Data mangling in the tidyverse
-
-This is a set of tutorials designed to teach using the tidyverse functions for data cleaning, reshaping, visualizing etc.
-The chapter numbers are relevant chapters from the excellent (and freely available) book ["R for Data Scientists" (R4DS)](http://r4ds.had.co.nz/)
-
-| Tutorial | R4DS chapter(s) | Core packages / functions |
-|----|---|---|
-| [R Basics](inputs/Assignments-tutorial-1-sol.html) | 4 | (base R functions) |
-| [Transforming Data]() | 5 | dplyr: filter, select, arrange, mutate | 
-| [Summarizing Data]() | 5 | dplyr: group_by, summarize |
-| [Visualizing Data]() | 3 & 7 | ggplot2  |
-| [Reshaping data]() | 12 | tidyr: spread, gather |
-| [Combining (merging) Data]() | 13 | dplyr: inner_join, left_join, etc. | 
-| [Basic string (text) handling]() | 14 | readr: str_detect, str_extract etc., iconv |
 
 # Statistical Analysis
 
