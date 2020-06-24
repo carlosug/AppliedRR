@@ -1,0 +1,241 @@
+---
+title: 'Assignment Workshop 5b: Gentle introduction to Logistic Regression'
+author: "Carlos Utrilla Guerrero"
+date: "6/11/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## WELCOME
+
+
+This tutorial serves as an introduction to logistic regression and covers:
+
++ The essence of logit models
+
++ Simple Logistic regression: Predicting the probability of response Y with a single explanatory variable X
+
++ Multiple Logistic regression: Predicting the probability of response Y with multiple predictor variables 
+
+
+
+## What is Logistic Regression?
+
+Logistic regression (aka logit regression or logit model) is a regression model where the dependent variable Y is categorical. Logistic regression allow us to estimate the probability of a categorical response based on one or more explanatory variables (X). It allows us to say that the presence of a specific explanatory variable does cause an increases (or decreases) the probability of a given outcome (dependent variable) by a specific percentage. This tutorial covers the case when Y is binary — that is, where it can take only two values, “0” and “1”, which represent outcomes such as pass/fail, win/lose or healthy/sick. Cases where the dependent variable has more than two outcome categories may be analysed with multinomial logistic regression, or, if the multiple categories are ordered, in ordinal logistic regression. 
+
+
+
+### Case Study
+
+A Data Science Researcher in the University of Maastricht is interested in investigate how variables, such as statistics exam score, responsible exam score, prestige of the undergraduate institution and gender, effect admission rate into the new graduate program launched at the Institute of Data Science called Responsable Data Science. We are going to work with a response binary variable (y), admit/don’t admit
+
+#### Description of the data
+
+We have generated hypothetical data, which can be obtained from this link:
+https://docs.google.com/spreadsheets/d/1QgksUXsOq2Lz7UyHAvdGTZozUDZd5mUuKM3WPn5q_Go/edit#gid=0
+
+
+
+This dataset has a binary response (outcome, dependent) variable called `admit`. There are four explanatory variables: `stats`, `rank`, `responsible` `female`. We will treat the variables `stats` and `responsable` as continuous. The variable `rank` takes on the values 1 through 4. Institutions with a `rank` of 1 have have highest prestige, while those with a rank of 4 have the lowest. The `female` variable is 0 when male and 1 in case is female.
+
+*Import the data*:
+
+```{r}
+library(readxl)
+ResponsableDataScience <- read_excel("../data/InstituteofDataScience.xlsx")
+```
+
+
+
+Check the `ResponsableDataScience`variables:
+
+```{r}
+str(ResponsableDataScience)
+```
+
+
+
+We can get basic descriptives for the entire data set by using `summary()`
+
+```{r}
+summary(ResponsableDataScience)
+```
+
+
+
+
+#### The essence of logit models
+
+
+Let's first have a look on the relationship between  and `stats` variable and whether or not the student was admitted in the graduate program:
+
+```{r}
+## Plotting the data
+library(ggplot2)
+ggplot(ResponsableDataScience, aes(stats, admit)) +
+  geom_point()
+
+```
+
+So each dots representdifferent students and its grade in `stats` connected with whether or not they were admitted into the Graduate Program. Value 1 are students that were admited and value 0 not admitted.
+
+In order to fully understand the differences between linear and binomial regression, we can model this relationship using a linear regression model for example. Let's try it and add it on the plot:
+
+```{r}
+
+ggplot(ResponsableDataScience, aes(stats, admit)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE) + # linear regression and not plot the standard error
+  coord_cartesian(ylim = c(0,1)) # limit the plot
+```
+
+Well, quite interesting plot! The linear model is not really a good fit right? Indeed, it is violating some of the assumptions for linear model such as homoscedasticity. Thus, let represent this with the binomal regression model using the same plot but now, with the method `glm`(Generalize Linear model as a family models that are not linear, such logistic model):
+
+```{r}
+ggplot(ResponsableDataScience, aes(stats, admit)) +
+  geom_point() +
+  geom_smooth(method = 'glm', se = FALSE, method.args = list(family = 'binomial')) + #  and not plot the standard error
+  coord_cartesian(ylim = c(0,1)) # limit the plot
+```
+*Note*: if you get this ``geom_smooth()` using formula 'y ~ x'`, dont worry much, your plot should be correctly displayed in your R studio.
+
+As you might notice, this blue line appear to fit much better our data. Instead of linear regression, straight line, we just added a binomial curve. So this is essentially what we do in modelling, so the model looks a little bit better when predicting admit rate based on stats scores. So the binomial model will predict those values closer to 0 as not addmitted, whereas it will predict students as addmitted if the value is around 1.
+
+#### Logistic regression with a single continouos predictor variables
+
+So, lets build a simple logistic regression formally, and we can see how likely a student is admitted in the graduate program with a unit change of `stats` score. Let's create a `logitmodel` to save our results as follow. The type of code is pretty similar as the linear regression:
+
+
+```{r}
+# MODEL ADMIT BY STATS
+logitmodel <- glm(formula = admit ~ stats, # response variable ~ explanatory variable
+                  data = ResponsableDataScience,
+                  family = 'binomial')
+```
+
+Go ahead and look at the models output:
+
+```{r}
+# call the result object
+summary(logitmodel)
+```
+
+
+*Model Output Interpretation*
+
+* Call, this is R reminding us what the model we ran was, what options we specified.
+
+* Deviance residuals, which are a measure of model fit. This part of output shows the distribution of the deviance residuals for individual cases used in the model. 
+
+
+* Coefficients with their standard errors, the z-statistic (sometimes called a Wald z-statistic), and the associated p-values. Both `intercept` and `stats` are statistically significant. We can get the coefficient models from the model output as following:
+
+```{r}
+coef(logitmodel)
+```
+
+So the 8.70764 is the log odds of the variable `stats` and means that for a one unit increase in `stats`, the log odds of being admitted to graduate school increases by 0.804.
+
+To derive odds ratios from log odds you need to take the exponent of the coefficient (e.g. to do the opposite of log):
+
+```{r}
+exp(coef(logitmodel))
+```
+
+ informally speaking, this numbers here tell  is telling us that for one unit increase in `stats` grade, a students is 6049 more likely to be admitted in the graduate program. So that is the way we interpret odd ratios. Learn more about log odds and odds ratios here: 
+
+- https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faq-how-do-i-interpret-odds-ratios-in-logistic-regression/
+
+#### YOUR TURN:
+
+*Using the previous steps, replicate a simple logistic regression model by adding `responsable` score variable into the model*.
+
+
+
+#### Multiple Logistic regression
+
+When dealing with logistic regression models, it can be possible that your explanatory variables are continous but also they can be categorical. So next step is to create a model that predict admission based on both, categorical and continous variables.
+
+In this time, we want to predict `admit` based on `stats` and `rank`. Let's call it `logitmodel1`. It is our second logistic model. But first, remember to convert into factor the variable `rank` as following:
+
+```{r}
+
+# convert into a factor
+ResponsableDataScience$rank <- factor(ResponsableDataScience$rank)
+
+```
+
+
+Now, we need to type a R command that stores the model results. First create a object called `logitmodel1` and then `summary()` :
+
+```{r}
+
+# create the second model
+logitmodel1 <- glm(formula = admit ~ stats + rank, # binomial formula with the two explanatory variables
+                   data = ResponsableDataScience,
+                   family = 'binomial')
+```
+
+Again, we can get our results with `summary()`:
+
+```{r}
+summary(logitmodel1)
+```
+
+
+*Interpretation:*
+
+We have got again coefficints for each of our explanatory variables and the correspondent p-values. You can easily identify that stats is highly significant since the p-value is closely to zero. That means that we are certaintly sure that its estimated coefficient is 8.6063. But what comes interesting for us now is the `rank` variable. We have three coefficients and the reason for this is that `rank` is a factor with four level so this coefficients will be comparing always against the reference or baseline level. This happens cause we earlier considered `rank` as a factor and if we wouldn't make this change, we would have just added this variable as continous. The way that we would interprete this (the coefficient of `rank` variable) is for example, having attended an undergraduate institution with rank of 2, versus an institution with a rank of 1, changes the log odds of admission by -0.1914.  The log odds of admission decreases by 1.32 as we go from rank 1 to rank 3. All of this means that the higher prestigue of the undergraduate university has, the more likely is a student to be admitted. Altough if you have noticed, none of them are statistically significant for our model.
+
+Likewise, we are going to convert our logs odds into odds ratios to achieve better intepretation of what we are saying:
+
+```{r}
+exp(coef(logitmodel1)) # calculate odds ratios
+```
+
+So, for one unit increase in stats score, the student is 5.452 times more likely to be admitted in the graduate program. The rest of odds ratios that correspond to `rank` variable are quite difficult to interpret it since there are smaller than 1. How is its usually interpreted is to calculate the inverse of this number. For instance, the rank2 is 8.257842e-01, lets calculate the inverse:
+
+```{r}
+1/8.257842e-01
+5.452324e+03
+```
+
+For `rank2` then, student was 1.33 times LESS likely to be admitted than a student with undergraduate in the rank 1. Similarly the odds ratios for the others levels, since we do get values less than one. Lets calculate their inverse:
+
+```{r}
+
+#rank3
+1/2.649940e-01
+```
+
+A the student was 3.77 times less likely to be admitted if she took her undergraduate courses in rank 3 than rank 1 university.
+```{r}
+#rank4
+1/3.561867e-01
+```
+A the student was 2.80 times less likely to be admitted if she took her undergraduate courses in rank 4 than rank 1 university.
+
+
+*YOUR TURN*
+
+Create a logistic model that predicts the admission rate based on `responsable` scores, `stats` scores and `female` variable.
+
+
+```{r}
+class(ResponsableDataScience$female)
+ResponsableDataScience$female <- factor(ResponsableDataScience$female)
+logitmodelfemale <- glm(formula = admit ~ stats + female, # binomial formula with the two explanatory variables
+                   data = ResponsableDataScience,
+                   family = 'binomial')
+
+summary(logitmodelfemale)
+```
+
+
+
+

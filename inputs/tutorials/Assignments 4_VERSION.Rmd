@@ -1,0 +1,632 @@
+---
+knit: markdowntemplates::to_jupyter
+---
+
+## WELCOME
+
+### Learning outcomes:
+By the end of this assignment(s), you should be able to:
+* Hypothesis testing
+* Correlation and covariance
+* Pearson correlation and scatter plots
+* Loop functions in R
+
+Did you prepare a data cleaning file, or a file that holds chunks of code that you want to reuse? 
+
+In terms of structuring your scripts it is most convenient if you have the file description first, then source and libraries and then the remaining code. Personally I seperate functions I have written myself, from data cleaning code and yet another file to do the analysis. Using the source() function you can connect the different stages of your workflow.
+
+```{r}
+library(readxl)
+mydat <- read_excel("../data/Workshop Statistics_ descriptives .xlsx")
+```
+
+
+
+
+
+### Two-sample t-test: Paired t-test
+
+As you already know, t-Tests are a great way of identifying if two group means are statistically different. This can be done by comparing a sample to the population (one-sample) or comparing two different samples (two-sample).T-tests are further broken down into two categories: unpaired t-tests and paired t-tests. This tutorial will focus on the latter.
+
+*What is a paired t-test?*
+A paired t-test (also known as a dependent t-test) is a statistical test that compares the means and of two related groups to determine if there is a significant difference between the two groups. Paired t-tests are considered more powerful than unpaired t-tests because using the same participants or subjects eliminate variation between the samples that could be caused by anything other than what’s being tested.
+
+*Paired vs unpaired t-test*
+The unpaired test compares group means idependently. However, when utilizing paired t-tests, the observations are not independent and so tests the mean difference to determine if there is a signficant difference between treatments.
+
+As you have shown in the lecture, the generally accepted analysis process for t.test is as following:
+
+
+* Calculate the difference (d) between each pair of value
+
+* Compute the mean (m) and the standard deviation (s) of d
+
+* Compare the average difference to 0. If there is any significant difference between the two pairs of samples, then the mean of d (m) is expected to be far from 0.
+
+
+Note: Paired t-test can be used only when the difference d is normally distributed. This can be checked using Shapiro-Wilk test.
+
+
+## Dataset:
+
+To illustrate the paired t-test, we will use the Student's Sleep Data.
+
+*Description*
+Data which show the effect of two soporific drugs (increase in hours of sleep compared to control) on 10 patients.
+
+*Format*
+A data frame with 20 observations on 3 variables.
+
+[, 1]	extra	numeric	increase in hours of sleep
+[, 2]	group	factor	drug given
+[, 3]	ID	factor	patient ID
+
+
+*Source*
+Cushny, A. R. and Peebles, A. R. (1905) The action of optical isomers: II hyoscines. The Journal of Physiology 32, 501–510.
+
+Student (1908) The probable error of the mean. Biometrika, 6, 20.
+
+
+## Import Dataset:
+
+In order to import the dataset, you can either download here: 
+- https://vincentarelbundock.github.io/Rdatasets/datasets.html
+- https://docs.google.com/spreadsheets/d/1ngyhOJhkRFBco8l6AEhHogHlVquHcfxRvVWwe9Zr2x0/edit#gid=0
+
+or use the build-in `sleep` function to directly import into R the data set. Please, run the following R command:
+
+```{r}
+# import R data set 'sleep'
+sleep <- sleep
+sleep
+PatientsiD <- c(1:20)
+IQ_Before <- c(101,124,89,57,135,98,69,105,114,106,97,121,93,116,102,71,88,108,144,99)
+IQ_After <- c(113,127,89,70,127,104,69,127,115,99,104,120,95,129,106,71,94,112,154,96)
+Differences <- IQ_After - IQ_Before
+IQStudy <- data.frame(PatientsiD,IQ_Before,IQ_After, Differences)
+View(IQStudy)
+
+
+
+# calculate the t
+n = mean(IQStudy$Differences)-0 # numerator
+d = sd(IQStudy$Differences)/sqrt(20) # denominator
+t = n/d
+t
+# Table of the mean and sdv of the differences
+library(dplyr)
+summarise(IQStudy,
+    count = n(),
+    mean = mean(Differences, na.rm = TRUE),
+    sd = sd(Differences, na.rm = TRUE)
+  )
+
+# Compute paired t test
+t.test(IQStudy$IQ_After, # after sample
+       IQStudy$IQ_Before, # before sample
+       alternative = 'greater',
+       conf.level = 0.99,
+       paired = TRUE) 
+
+
+abs(qt(0.01, 40)) # 99% confidence, 1 sided (same as qt(0.99, 40))
+abs(qt(0.01, 20)) # 99% confidence, 1 sided (same as qt(0.99, 40))
+
+M <- as.table(rbind(c(762, 327, 468), c(484, 239, 477)))
+dimnames(M) <- list(gender = c("F", "M"),
+                    party = c("Democrat","Independent", "Republican"))
+(Xsq <- chisq.test(M))  # Prints test summary
+Xsq$observed   # observed counts (same as M)
+Xsq$expected   # expected counts under the null
+Xsq$residuals  # Pearson residuals
+Xsq$stdres     # standardized residuals
+
+# Create contingency table
+ResponsableDS <-  as.table(rbind(c(100, 150, 20), c(20, 30, 180)))
+dimnames(ResponsableDS) <- list(gender = c("Boys", "Girls"),       # row names 
+                    course= c("Statistics", "Computer Science","Ethics & Responsability"))
+
+
+ResponsableDS # call the contingency table
+
+# use chisq() function
+(Xsq <- chisq.test(ResponsableDS))  # Prints test summary
+Xsq$observed
+Xsq$expected
+```
+
+### Check your data
+```{r}
+print(sleep)
+```
+
+## Preliminary test to check paired t-test assumptions
+
+*Assumption 1: Are the two samples paired?*
+Yes, since the data have been collected from measuring twice the hours of sleep of 10 students.
+
+*Assumption 2: Is this a sample normally distributed?*
+we need to check whether the differences of the pairs follow a normal distribution. Use Shapiro-Wilk normality test as described at: Normality Test in R.
+
++ Null hypothesis: the data are normally distributed
++ Alternative hypothesis: the data are not normally distributed
+
+```{r}
+# compute the difference
+d <- with(sleep, 
+        extra[group == "2"] - extra[group == "1"])
+str(sleep)
+
+# Shapiro-Wilk normality test for the differences
+shapiro.test(d) # => p-value = 0.6141
+boxplot(sleep$extra ~ sleep$group,
+        col = c("red", "blue"),
+        ylab = 'extra sleep',
+        xlab = 'groups',
+        main = 'formula = extra ~ groups')
+
+```
+
+
+We are assessing if there is a statistically significant effect of a particular drug on sleep (two measurement groups with 10 patient each group). We need to test if there is existing differences between means of the sleep hours. Since we measure the number of hours sleeping to the same patients with different drug given, we are in 'paired' data case.
+
+```{r}
+t.test(x = sleep$extra[sleep$group == 1],
+       y = sleep$extra[sleep$group ==2],
+       paired = TRUE)
+
+?PlantGrowth
+t.test(extra ~ group,
+       data = sleep,
+       paired = TRUE)
+```
+
+p-value is smaller than 0.05 then Ho (no difference in sleeping hours between drug given) is rejected and we can conclude that there true differences between drugs. In addition, cero value is not within the boundaries and consequently, it can't be accepted the equal means.
+
+
+This t-test has been executed with the assumption of different variance due to defaul method of `var.equal = FALSE`.
+
+We then need to test the hyphotesis of the equal variance between groups.
+
+```{r}
+var.test(sleep$extra[sleep$group == 1], sleep$extra[sleep$group == 2], 1 )
+```
+
+P-value is higher than 0.05, a clear indicator that we accept the null hypothesis of equal variances. This fact is supported by the boundaries, the value 1 is within this range [0.198297, 3.214123].
+
+Thus, we t.test need to be executed with the assumption of equal variances `var.equal = TRUE`
+
+```{r}
+t.test(x = sleep$extra[sleep$group == 1], y = sleep$extra[sleep$group ==2], var.equal = TRUE, paired = TRUE)
+```
+
+
+
+## Other adjustments of t-test
+This above exercise has demonstrated how to do paired t-tests. There are other adjustments we can make to these functions and this section will explain a few of the available options. The following function adjustments work for both t.test:
+
+### Alternative Hypothesis
+As you know, you can adjust the alternative hypothesis easily when calling the function. The default alternative is two-sided, which means your null hypothesis is H0=0 and the alternative is HA≠0. 
+
+For one-sided tests:
+
+set alternative = "less" if H0≥0 and HA<0, and
+      alternative = "greater" if H0≤0 and HA>0.
+
+## Exercise: How would you write in R a test where you want to determine if the difference in average increased sleep of the two groups is ≤0, using the sleep dataset:
+
+```{r}
+t.test(extra~group, data = sleep, paired = TRUE, var.equal = TRUE,alternative = "greater") 
+t.test(extra~group, data = sleep, paired = TRUE, var.equal = TRUE,alternative = "less") 
+```
+
+Defining predefined (μ)
+You can also adjust the true value of the mean difference being tested by setting mu = x, where x is the true value of the mean difference.
+
+Suppose we want to test if the difference in average increased sleep of the two groups is ≥1, using the sleep dataset:
+
+```{r}
+t.test(extra~group, 
+       data = sleep,
+       alternative = "less",
+       paired = TRUE,
+       mu = 1) 
+```
+
+
+## Equal Variances
+The default for t.test is to assume unequal variances. However, if you would like to test with the assumption that the two variances are equal, you can add var.equal = TRUE when you call the function.
+
+```{r}
+t.test(extra~group, data = sleep, var.eq = TRUE)
+```
+
+## Testing multiple groups ANOVA
+Last tecture we covered one sample hypothesis test. This last section we went throughout two sample hypothesis tests. In these tests, you are either comparing 1 group to a hypothesized value, or comparing the relationship between two groups (either their means or their correlation). In this section, you will cover how to analyse more complex experimental designs with ANOVAs.
+
+
+### What is one-way ANOVA test?
+
+The one-way analysis of variance (ANOVA), also known as one-factor ANOVA, is a statistical technique, commonly used to study differences between two or more group means. In one-way ANOVA, the data is organized into several groups base on one single grouping variable (also called factor variable). This section describes the basic principle of the one-way ANOVA test and provides practical anova test examples in R software.
+
+### ANOVA test hypotheses:
+
+Null hypothesis: the means of the different groups are the same.
+Alternative hypothesis: At least one sample mean is not equal to the others.
+
+*Note that, if you have only two groups, you can use t-test. In this case the F-test and the t-test are equivalent*.
+
+
+When do you conduct an ANOVA? You conduct an ANOVA when you are testing the effect of one or more nominal (aka factor) independent variable(s) on a numerical dependent variable. A nominal (factor) variable is one that contains a finite number of categories with no inherent order. Gender, profession, experimental conditions for example. If you only include one independent variable, this is called a One-way ANOVA. If you include two independent variables, this is called a Two-way ANOVA.
+
+
+One-way ANOVA
+
+### 2 General steps to conduct an ANOVA
+Here are the 2 steps you should follow to conduct a standard ANOVA in R:
+
+1. Create an ANOVA object using the `aov()` function. In the `aov()` function, specify the independent and dependent variable(s) with a formula with the format `y ~ x1`  where `y` is the dependent variable, and x1, are one (more more) factor independent variables.
+
+```{r, eval=F, echo=T}
+# Step 1: Create an aov object
+mod.aov <- aov(formula = y ~ x1 + x2 + ...,
+               data = data)
+```
+
+
+2. Create a summary ANOVA table by applying the `summary()` function to the ANOVA object you created in Step 1.
+
+```{r, eval=F, echo=T}
+# Step 2: Look at a summary of the aov object
+summary(mod.aov)
+```
+
+
+```{r}
+age.aov <- aov(formula = age ~ tutor,
+                   data = mydat)
+
+summary(age.aov)
+
+```
+
+Let’s do an example by running both a one-way ANOVA on the PlantGrowth data.
+
+### Import your data into R
+
+Here, we’ll use the built-in R data set named PlantGrowth. It contains the weight of plants obtained under a control and two different treatment conditions.
+
+```{r}
+
+
+
+my_data <- read_excel("../data/growth.xlsx")
+
+
+
+my_data$group <- factor(my_data$group)
+
+```
+
+### Check your data
+To have an idea of what the data look like, we use the the function head(). The head() function randomly picks a few of the observations in the data frame to print out:
+
+```{r}
+head(my_data)
+```
+
+Note: In R terminology, the column “group” is called factor and the different categories (“ctr”, “trt1”, “trt2”) are named factor levels. The levels are ordered alphabetically.
+
+```{r}
+# Show the levels
+
+levels(my_data$group)
+levels(my_data$group)
+```
+If the levels are not automatically in the correct order, re-order them as follow:
+
+```{r}
+my_data$group <- ordered(my_data$group,
+                         levels = c("ctrl", "trt1", "trt2"))
+```
+
+
+Note: As you know, it’s possible to compute summary statistics (mean and sd) by groups using the dplyr package.
+
+```{r}
+library(dplyr)
+group_by(my_data, group) %>%
+  summarise(
+    count = n(),
+    mean = mean(weight, na.rm = TRUE),
+    sd = sd(weight, na.rm = TRUE)
+  )
+
+summarise(group_by(my_data, group),
+          count = n(),
+          mean = mean(weight, na.rm = TRUE),
+              sd = sd(weight, na.rm = TRUE)
+  )
+
+count <- length(my_data$weight[my_data$group=='ctrl'])
+n <- sum(my_data$weight[my_data$group=='ctrl'])
+n1 <- 10
+n/n1
+```
+
+
+### Visualise your data
+
+```{r}
+boxplot(my_data$weight ~ my_data$group,
+        col = c("red", "blue","yellow"),
+        ylab = 'weight',
+        xlab = 'groups',
+        main = 'formula = weight ~ groups')
+
+```
+
+From the plot, it looks like the groups are quite differents from each others. To test this, we’ll create an ANOVA object with aov. Because `weight` is the dependent variable and `group` is the independent variable, we’ll set the formula to formula = `weight ~ group`
+
+### Compute one-way ANOVA test
+
+*Question: We want to know if there is any significant difference between the average weights of plants in the 3 experimental conditions*
+
+The R function aov() can be used to answer to this question. The function summary.aov() is used to summarize the analysis of variance model.
+
+```{r}
+# Step 1: aov object with weight as DV and groups as IV
+plant.aov <- aov(formula = weight ~ group,
+                   data = my_data)
+```
+The output includes the columns F value and Pr(>F) corresponding to the p-value of the test.
+
+Now, to see a full ANOVA summary table of the ANOVA object, apply the summary() to the ANOVA object from Step 1.
+
+```{r}
+# Step 2: Look at the summary of the anova object
+summary(plant.aov)
+```
+
+
+### Interpret the result of one-way ANOVA tests
+The main result from our table is that we have a significant effect of groups on plant weight (F(2, 27) = 4.846, p = 0.005. However, the ANOVA table does not tell us which levels of the independent variable differ. In other words, we don’t know which group is better than which. To answer this, we need to conduct a post-hoc test.
+To learn more about the logic behind different post-hoc tests, check out the Wikipedia page here: https://en.wikipedia.org/wiki/Post_hoc_analysis. 
+One of the most common post-hoc tests for standard ANOVAs is the Tukey Honestly Significant Difference (HSD) test. 
+To see additional information about the Tukey HSD test, check out the Wikipedia page here: https://en.wikipedia.org/wiki/Tukey’s_range_test To do an HSD test, apply the TukeyHSD() function to your ANOVA object as follows:
+
+
+
+
+
+Research Question: Was there a difference between the treatment molecule in the number of days until the first occurrence of one of the following major negative events: (i) a decline in CD4 T cell count of at least 50 (ii) an event indicating progression to AIDS, or (iii) death?
+
+
+
+## Chi-square: chsq.test()
+
+The Chi-Square test of independence is used to determine if there is a significant relationship between two nominal (categorical) variables.  The frequency of each category for one nominal variable is compared across the categories of the second nominal variable. The data can be displayed in a contingency table where each row represents a category for one variable and each column represents a category for the other variable.  To learn more about how the test works and how to do it by hand, I invite you to read the article [“Chi-square test of independence by hand”](https://www.statsandr.com/blog/chi-square-test-of-independence-by-hand/).
+
+To briefly recap what has been said in that article, the Chi-square test of independence tests whether there is a relationship between two categorical variables.
+
+## Hypotheses:
+
+Let's say that a researcher wants to examine the relationship between gender (male vs. female) and empathy (high vs. low).  The chi-square test of independence can be used to examine this relationship.
+
+Then, the null and alternative hypotheses would be:  
+
+* The null hypothesis for this test is that there is no relationship between gender and empathy.
+
+* The alternative hypothesis is that there is a relationship between gender and empathy 
+  (e.g. there are more high-empathy females than high-empathy males). 
+
+In other words, the *Null hypothesis* assumes that there is no association between the two variables whereas, the *alternative hypothesis* assumes that there is an association between the two variables.
+
+
+A key difference between the chisq.test() and the other hypothesis tests we’ve covered is that `chisq.test()` requires a table created using the `table()` function as its main argument. You’ll see how this works when we get to the examples.
+
+Simply speaking, the Chi-square test of independence works by comparing the observed frequencies (so the frequencies observed in your sample) to the expected frequencies if there was no relationship between the two categorical variables (so the expected frequencies if the null hypothesis was true).
+
+## Example
+In this section, we will use the already known descriptive dataset (import into excel and call it mydat). You can download the data here: https://docs.google.com/spreadsheets/d/1JchKI5u-I5IcWbnM_JpMkMJIZX1012oJVoIEZz2ra3c/edit#gid=0
+
+Since we have missing data (e.g. -99), this statistic is not truly representative, and we have to make the necessary steps to clean the data. Here you have a brief summary of the steps that we have made last tutorial (please repeat):
+
+```{r}
+# change the name cols
+names(mydat)[6] <- "favPet"
+names(mydat)[7:8] <- c('GoT','LotR')
+# missing data
+mydat[mydat == -99] <- NA
+# dummy variable
+mydat$favPet[mydat$favPet==1] <- 0
+mydat$favPet[mydat$favPet==2] <- 1
+# convert to factor
+mydat$favPet <- factor(mydat$favPet, labels = c('cat','dog'))
+levels(mydat$favPet)
+```
+
+Let's check again the type of data:
+
+```{r}
+str(mydat)
+```
+
+We can create another dataset without missing data:
+
+```{r}
+newdata1 <- na.omit(mydat)
+```
+
+
+Since we only have one categorical data (factor) and Chi-square test requires two categorical variables, lets convert for instance tutor variable as categorical:
+
+```{r}
+mydat$tutor <- factor(mydat$tutor, levels = c('unknown',
+                                              'Koen',
+                                              'Khrystyna',
+                                              'Britt',
+                                              'Anouk',
+                                              'Daniëlle',
+                                              'Hidde',
+                                              'PEERS'))
+```
+
+# Exercise: Can you please check the levels of the tutor variable?
+```{r}
+levels(mydat$tutor)
+```
+
+We now create a contingency table of the two variables e.g. favpet and tutor:
+
+```{r}
+table(mydat$tutor,
+      mydat$favPet)
+```
+
+
+The contingency table gives the observed number of cases in each subgroup.
+
+It is also a good practice to draw a barplot to visually represent the data:
+```{r}
+library(ggplot2)
+ggplot(na.omit(mydat)) +
+  aes(x = favPet, fill = tutor) +
+  geom_bar() +
+  scale_fill_hue() +
+  theme_minimal()
+
+barplot(table(mydat$tutor,mydat$favPet))
+```
+
+
+Chi-square test
+
+If you want to see if the frequency of one nominal variable depends on a second nominal variable, you’d conduct a chi-square test. For example, we might want to know if there is a relationship between the year and favpet in our dataset.
+
+To conduct a chi-square test on these data, we will enter table of the two data vectors:
+
+```{r}
+mydat.cstest <- chisq.test(x = table(mydat$tutor,
+                                        mydat$favPet))
+
+# fisher test
+mydat.ftest <- fisher.test(x = table(mydat$tutor,
+                                        mydat$favPet))
+mydat.ftest
+```
+
+
+```{r}
+mydat.cstest$expected # get frequency table
+```
+
+* Note that it gave the warning because many of the expected values will be very small and therefore the approximations of p may not be right.The warning message found is due to the small cell values in the contingency table.
+
+In R you can use chisq.test(a, simulate.p.value = TRUE) to use simulate p values.
+
+```{r}
+mydat.cstest_modified <- chisq.test(x = table(mydat$tutor, # categorical 1
+                                        mydat$favPet), # categorical 2
+                           simulate.p.value = TRUE) # added for fixing p values
+
+mydat.cstest_modified
+```
+
+However, with such small cell sizes, all estimates will be poor.
+
+
+
+### Interpretation
+
+It looks like we got a test statistic of  X-squared = 7.4582 and a p-value of 0.4063. At the traditional p = .05 threshold for significance, we would conclude that we fail to reject the null hypothesis and state that we do not have enough information to determine if students from different tutor groups differ in how likely they are to prefer cats or pets.
+
+
+### Example
+
+In the built-in data set survey, the Smoke column records the students smoking habit, while the Exer column records their exercise level. 
+
+Let's import the data as following:
+
+```{r}
+library(MASS) # load the MASS package
+data <- survey
+survey.data1 <- read_excel("../data/survey.xlsx")
+
+survey.data1$Exer <- factor(survey.data1$Exer, levels = c("Freq","None","Some"))
+survey.data1$Smoke <- factor(survey.data1$Smoke, levels = c("Heavy","Never","Occas","Regul"))
+survey.data <- survey
+
+smoke <- data.frame(survey$Sex,survey$Exer,survey$Smoke) # import the data
+colnames(smoke) <- c("gender","Exer", "Smoke") # change col names
+
+```
+
+Exercise: Can you check if the variables of the smoke.data are categorical(factor)?
+
+```{r}
+str(survey.data)
+str(survey.data1)
+levels(survey.data1$Smoke)
+```
+
+We can see that the allowed values in Smoke are "Heavy", "Regul" (regularly), "Occas" (occasionally) and "Never". As for Exer, they are "Freq" (frequently), "Some" and "None".
+
+Exercise: Create a contigent table that shows smoking habits against the exercise level with the function `table()`
+
+```{r}
+table(survey.data1$Exer,
+      survey.data1$Smoke)
+```
+
+Exercise: Create a barplot to display both variables
+
+```{r}
+ggplot(survey.data1) +
+  aes(x = Exer, fill = Smoke) +
+  geom_bar() +
+  scale_fill_hue() +
+  theme_minimal()
+names(data)[]
+names(data)[names(data) == "Right"] <- 'Av stress lev'
+
+
+```
+
+
+Question:
+Test the hypothesis whether the students smoking habit is associated of their exercise level at .05 significance level.
+
+```{r}
+chisq.test(x = table(survey.data1$Exer,
+                     survey.data1$Smoke))
+```
+```{r}
+mydat.ch <- chisq.test(x = table(survey.data1$Exer,
+                     survey.data1$Smoke),
+           simulate.p.value = TRUE)
+
+mydat.ch$expected
+
+mydat.ftest <- fisher.test(x = table(survey.data1$Exer,
+                                        survey.data1$Smoke))
+mydat.ftest
+```
+
+ we combine the second and third columns of tbl, and save it in a new table named ctbl. 
+
+```{r}
+
+# create a contigency table
+table = table(survey.data1$Smoke, survey.data1$Exer)
+
+# combine rows and columns
+ctable = cbind(table[,"Freq"], # first column
+               table[,"None"] + table[,"Some"]) # second column combine
+
+chisq.test(ctable)
+
+ 
+```
+

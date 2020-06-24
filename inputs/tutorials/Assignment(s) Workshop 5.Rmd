@@ -1,0 +1,544 @@
+---
+title: 'Applied Research: Advance Statistics with R'
+author: "Carlos Utrilla Guerrero"
+date: "6/10/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## WELCOME
+
+
+By the end of this practical you will know how to:
+
+
+* Create simple and multiple linear regression models with `lm()`
+
+* Explore the outputs of your models, including coefficients, confidence intervals, and p-values.
+
+* Explore the residuals and fitted values of a linear model.
+
+* Use your model to make predictions for new data
+
+
+
+## DATASETS
+
+The baseball.csv file contains *Major League Baseball Data* from the 1986 and 1987 seasons. The data originally come from the `ISLR` package.
+
+https://docs.google.com/spreadsheets/d/1644rcEM0Jk8qN1l4_2aewfgAuNQ2jg0cJNgSX--ebXM/edit#gid=0
+
+Using the following command in R, load the baseball.excel data into R and store it as a new object called hitters.
+
+```{r}
+getwd()
+library(readxl) # import library
+baseball <- read_excel("../data/Baseball.xlsx") # import the baseball.xlsx file
+```
+
+Take a look at the first few rows of the dataset(s) by printing it/them to the console, it should look like the table below:
+
+```{r}
+head(baseball,6)
+```
+
+Take a look at the structure of the data in order to see the type of variables `mydat` has:
+
+```{r}
+str(baseball)
+```
+
+
+
+Now, you see that this data contains 50 observations and 20 variables. Also, we could clearly see that most of them are numerical (continuous) and few of them are categorical. Since we have imported the dataset with the `excel_file` format and method, these categorical data are considered as `chr` (character) and it is not very good for further analysis. We need to convert them into factor. For instance, we can confirm that  the variable `League` is a variable type as `character` by writting this command `class()` as following:
+
+```{r}
+class(baseball$League) # check the factor variable "League"
+```
+  
+So, as you well noted, there is two more categorical data that R does not recognize them as `factor`. Let's do it together:
+
+```{r}
+# convert the variable "League" into factor
+baseball$League <- factor(baseball$League)
+# convert the variable "Division" into factor
+baseball$Division <- factor(baseball$Division)
+```
+
+
+### Exercise 1: Can you please convert the variable `NewLeague` into a factor. Use can use the previous command to successfully change the variable type:
+```{r}
+baseball$NewLeague <- factor(baseball$Division)
+```
+
+
+Now, it is time to check whether we have correctly switched the variables type with the `class()` function as before:
+
+```{r}
+class(baseball$League) # check for variable League
+```
+
+```{r}
+class(baseball$Division) # check for variable Division
+
+```
+
+Perfect! All our 3 categorical data has been correctly converted into `factor`. Let's have a look again the structure of our baseball dataset:
+
+```{r}
+str(baseball)
+```
+
+Note that now the values of these `factor` variables were text (i.e. League variable have "A" and "B" for instance) in the data file so R automatically interpreted them as categorical variables. Due to the fact that we import the file in excel, R does not directly recognize them as factor and that is why we need to convert them from `char` to `factor`.
+
+Great. It seems like we are ready to make some summary of our dataset in order to get a first impression of the data distribution. We can use `summary()` to quickly investigate our data
+```{r}
+summary(baseball)
+```
+
+Next thing to do is to check for missing values. You already know that you can use the command `is.na()` in R in order to see if there are missing values. If you run it, you will see that there are any NA values in our dataset; that is perfect! Nonetheless, a good point of `summary()` is that also will give you a count of NA values.
+
+At this point, we are very interested on exploring the Baseball dataset. We are wondering if there is a relationship between the number of `Hits` a player had and his `Salary.` Lets create a scatterplot for this. Try this command in your R console
+
+```{r}
+library(ggplot2) # import ggplot2 library for visualisation
+ggplot(baseball, aes(x = Hits, y = Salary)) +
+  geom_point(col = "pink") +
+  labs(title = "Is there any relationship between baseball player Hits vs Salary",
+       subtitle = "Plotting your data is the first step to figuring out",
+       caption = "R course Venlo Course")
+```
+
+
+The y-axis is the amount of salary (the dependent variable, the thing you’re interested in, is always on the y-axis) and the x-axis is the total Hits. Each pink dot represents one player the baseball dataset.
+
+Glancing at this data, you probably notice that salary are higher on players that hits a lot. That’s interesting to know, but by how much?
+
+Now imagine drawing a line through the chart above, one that runs roughly through the middle of all the data points. This line will help you answer, with some degree of certainty, how much a player typically earned when he did hit a certain amount of balls. Let's make together a scatterplot to check it out:
+
+```{r}
+ggplot(baseball, aes(x = Hits, y = Salary)) +
+  geom_point(col = "pink") +
+  geom_smooth(method='lm',  # Add linear regression line 
+              se = FALSE) # # Don't add shaded confidence region
+  labs(title = "Is there any relationship between baseball player Hits vs Salary",
+       subtitle = "Plotting your data is the first step to figuring out",
+       caption = "R course Venlo Course")
+
+```
+
+
+So the blue line is called the regression line and it’s drawn to show the line that best fits the data. In other words, the blue line is the best explanation of the relationship between the independent variable (`Hits`) and dependent variable (`Salary`).
+
+## Exercise 2: Based on this plot, do you expect there to be a relationship between these variables? Which kind of test would you run in order to quantitatively support your answer?
+
+In addition to drawing the line, In statistics, once you have calculated the slope and y-intercept to form the best-fitting regression line in a scatterplot, you can then interpret their values:
+
+Salary=a+Hits∗b
+
+
+In this case, “a” and “b” are called the intercept and the slope respectively. With the same example, “a” or the intercept, is the value from where you start measuring. The slope measures the change of `Salary` with respect to the `Hits`. In general, for every one more hits a player did achieve it, his salary got increase in “b”. To fully understand what we are talking about, we need to introduce you for the first time A Simple Linear Regression.
+
+At this point, I am kind of curious about the relationship: is there any possibility to suggest that we can predict the amount of money player earn and number of hits? 
+
+We are going to create a model that uses the number of `hits` a player does as an indicator of increasing in player salary `Salary`. I believe this model makes sense since we firstly show a linear relationship between both variables and I would assume that the better a player does, the higher increase in salary. Let's go ahead and try to create our first simple linear regression
+
+
+## SIMPLE LINEAR REGRESSION
+
+### What is a linear regression?
+A linear regression is a statistical model that analyzes the relationship between a dependent variable (y) and one or more variables (often explanatory variables or indepedent x). You make this kind of relationships in your head all the time, for example when you calculate the age of a child based on her height, you are assuming the older she is, the taller she will be. Or just the example taken above as a way to hypothesize a expected relationship between `Salary` and `Hits`. 
+
+As mentioned before, we attempt to create a linear model to see this relationship. This model will predict `Salary`, using our explanatory variable `hits` in our context the equation of the regression line is found to be:
+
+Salary=B0+B1*Hits
+Salary=a+Hits∗b
+
+
+Using the guide below, we are going to conduct a regression analysis predicting a player’s `Salary` as a function of his `Hits` value. We are going to save the result to an object called `baseball_simple`:
+
+```{r}
+baseball_simple <- lm(formula = Salary ~ Hits, # linear regression formula (Dependent ~ Independent)
+                data = baseball) # the name of my dataset
+```
+
+With the command `summary(baseball_simple)` you can see detailed information on the model’s performance and coefficients.
+
+```{r}
+summary(baseball_simple)
+```
+
+### Interpretation
+
+R will give you always the following information for model output:
+
+*Call*
+
+This will show you what you actually just run. The linear equation of:
+
+lm(formula = Salary ~ Hits, data = baseball)
+
+*Residuals*
+
+We can see the residuals of the `baseball_simple` as following:
+
+```{r include=FALSE}
+baseball_simple$residuals
+```
+
+The next item in the model output talks about the residuals. Residuals are essentially the difference between the  observed  values (`salary`) and the response values that the model predicted. The Residuals section of the model output breaks it down into 5 summary points. In our example, we can see that the distribution of the residuals do not appear to be strongly symmetrical. That means that the model predicts certain points that fall far away from the actual observed points. We could take this further consider plotting the residuals to see whether this normally distributed, etc. but will skip this for this example for the moment.
+
+*Coefficients*
+We can see the Coefficients of the `baseball_simple` as following:
+
+
+```{r}
+baseball_simple$coefficients
+```
+
+Thus, we have a our mathematical equation as `salary` variables as our dependent variable and our explanatory variable `Hits`.
+Salary=B0+B1*Hits
+Salary=262.886+3.195Hits
+
++ 1. Intercept: 
+
+
+
+This values will be always in the equation, unless you explictly erase it from the model
+
++ 2. Hits:
+
+One variable included into our linear model. In this particular case we just have added one.
+- Estimate values: this is giving us our estimated coefficients (betas) and this is the paramenter that we need to interpret. So the first one here is given 262.886 that is our intercept value (B0). And what does it means? It is the average value for `Salary` when `Hits` is zero. So what is saying is when `Hits` is zero, we would expect an increase of the players salary of 262.886 dollar on average. However, do not care much about it beacuse it usually does mean nothing in real life. The next coefficient 3.19 corresponds to (B1). This is really important and it tells us, in practical sense, our meaning about the equation. It is called *slope* and it shows us the numerical relationship between our two variables. And what does it mean in general?  Given a one unit increase in Hits (X independent variable) there will be an expected change in Salary(y), on average of 3.195 units. What does means in our case? For one `Hits` increase that baseball players does, we expect them to win 3.195 more dollars in their salary on average. You might notice that we can say that cause we have two continouous variable. So this is the most tricky part to get when interpretating your model results so take your time to fully understand it!
+
+*Std. Error*
+
+Since we have an estimate for a coefficient it has some errors attached to it. Remember that standard error is the variability we would expect in the our variable `Hits` in we did repeated sampling. So this column captures the sampling variability. For instance, we might have estimated value for `Hits` of 3.100 or 3.197 and so on, so this variability is entirely captured by the standard error.
+
+*t value*
+
+The t value of our estimated is just the ratio of the estimate divided by the standard error. In other words, how big is my estimate relative to its error. The bigger is the difference between them, the bigger the t value.
+
+*p-value*
+
+Each of the previous t values have it is own p value. This p value is just telling us, as you know, how statistically significant each of our estimates is in our model. In our model, we do not care about the intercept. Rather, we care about p values for our slope (the variable `Hits`). So this value in our model is quite small 0.0382. We will reject the null hypothesis (e.g. `Hits` estimate is equal to zero) and say informally speaking: "yes, this 3.19 is statistically significant". Indeed, The p-value is 0.0382 which is 'significant' at the 0.05 level. We do then expect there to be a positive relationship between hits and salary in all players.
+
+*Signif. codes*
+
+The (*) associated with the p values are the level of significance.
+
+*Residual standard error*
+
+It is a very basic quantification of how well or poorly our model is doing at predicting our data on average, you can think like "the average error for your model". Sometimes a model really predicts closely the data and sometimes does not, the model predicted very bad.  In other words, we want our model to have a small residual error. In our example, the model when it tries to use `Hits` variable to predict the number of increase `Salary` is off on an average of about  489.6 (e.g. either on average predict 489.6 `Hits` to high or low when predicting individual data points.
+
+
+*Multiple R-Squared and Adjusted R-squared*
+
+
+
+The Multiple R-squared (Standard R squared) it is interpreted as the percentage of the variation in the response variable (Y) that is explained by the variation in the explanatory variable (X). In other words, it determines how well our model is doing at explaining the total variation of the response variable (Y). It always lies between 0 and 1 (i.e.: a number near 0 represents a regression that does not explain the variance in the response variable well and a number close to 1 does explain the observed variance in the response variable).  Nevertheless, it’s hard to define what level of R2 is appropriate to claim the model fits well. Essentially, it will vary with the application and the domain studied.
+
+The adjusted R-squared is similar as the previous Multiple R-squared but with an adjustment: the number of variables adding into the model. This adjusted R-squared takes into account how many explanatory(X) variables are in your model. What it does is penalize you for adding useless (e.g. not statistically significant) variables to the model.
+
+These metrics are used to assess the model accuracy.
+
+
+*Note*: In multiple regression settings (e.g. adding more explanatory variables), the Multiple R-squared will always increase as more variables are included in the model. However, if the variables you are adding are not statistically significant, then adjusted R-squared takes this into account, and present a much lower value than Multiple R-squared.
+
+To sum up, both metrics will tell you how much of the total variation is explained by the model. If you keep adding explanatory variables into your model without taking into account whether or not these are significant, Adjusted R squared will penalize you. That is the main reason why this Adjusted R squared metric is a good measure when start considering a more complex models.
+
+Multiple R-squared:  0.08646,	Adjusted R-squared:  0.06743 
+In our example, the R2 we get is 0.06743. Or roughly 6.743% of the variance found in the response variable (*Salary*) can be explained by the explanatory variable (*Hit*). Step back and think: If you were able to choose any variable in the baseball dataset to predict an increase of players *Salary* , would number of *Hit* be one and would it be an important one that could help explain how *Salary* would vary based on *Salary*? I guess it’s easy to see that the answer would almost certainly be a yes. However, it seems that in order there are much more variables (e.g. Walks, Runs, CAtBat) that might be of importance to predict *Salary*. That why we get a relatively weak R2.
+
+*F-statistic: 4.543 on 1 and 48 DF,  p-value: 0.0382*
+
+F is a ratio of how well the model is doing over the errors (e.g. mean square model / mean square errror). A higher F values mean better model. So the bigger the F statistic the better model we have achieved. We also have two numbers for degrees of freedom: 1, which is the degrees of freedom of the model and the 48 (e.g. number of observation minus estimated variables).
+
+F-Statistic measures the significance of the overall model. In our case, since we only has added one variable in our model (*Hit*) and it turned out statistically significant at 5% (*), the F-Statistic will be also statistically significant. Thus, when adding more variables (e.g. multiple regression) this situation situation will change, and we will be able to distinguish between statistically significant of the variable versus statistically significant of the overall model.
+
+p values is its corresponded p value for F statistic. It indicates that the overall model is significant.
+
+
+Thus, how can be it possible? How can be that our model is significant with a R squared of 0.06743? Can a Regression Model with a Small R-squared Be Useful?
+
+It’s easy to dismiss the model as being useless.  You’re only explaining 4% of the variation,  Why bother?
+
+But think about this.  If you consider about all of the things that might affect player’s salary, do you really expect performance to be the major and unique contributor?
+
+Even though I’m not a sport researcher, I can think of quite a few variables that I would expect to be much better predictors of salary.  Things like age, error history, assist, League division could also help us to determine how much worth a player is, isn't? And putting all of them into the model would indeed give better predicted values.  If the only point of our model is prediction, the model would do a pretty bad job. But it wasn’t.The first focal point was to see if there was a small, but reliable relationship.  And there was. In order to create a much more powerfull model prediction, we will just need to consider adding other variables in order to improve its prediction ability. We will learn this in the next section, Multiple linear Regression. For now on, then continue with our model analysis performance.
+
+
+*Fitted Values:*
+
+As you might notice, our  `baseball_simple` has estimated the `Salary` values according to our linear model. If you type in R `baseball_simple$fitted.value`, you will see all your estimated/fitted values:
+
+```{r}
+# estimated values
+baseball_simple$fitted.values
+```
+
+This list of numbers are basically the new salary amounts per player that our model estimate. For instance, the first player will earn 425.8066 dollar according to our linear model.
+
+```{r}
+# Predicted value for first player
+head(baseball_simple$fitted.values,1)
+```
+
+If we look a the observed salary that this player won, we can see that the differences between them is quite large:
+```{r}
+# Salary for the first player
+head(baseball$Salary,1)
+
+```
+
+Let's check how much number of hits he did:
+
+```{r}
+head(baseball$Hits,1)
+```
+
+
+Wow! That difference between this two numbers is too large! 355.806613 dollar more!!  Our model did not work very well for predicting purposes!
+
+What we just have done here is to make the difference between the observed (`Salary`) and estimated value (`fitted value`). These differences are called: Residuals (or errors). We will come back to them in a later stage. Now, lets generate a plot that shows the differences between them. This will give us a visual sense of what is the variation between `observed` and `fitted` values,
+
+```{r}
+ggplot() +
+  geom_point(aes(x = baseball$Hits, y = baseball$Salary),
+             colour = 'red') +
+  geom_line(aes(x = baseball$Hits, y = fitted(baseball_simple)),
+            colour = 'blue') +
+    labs(title = "Observed vs Predicted", x = "Hits", y= "Salary",
+       subtitle = "It is a pair scatterplot - fitted (blue line) and observed data (red dots)",
+       caption = "R course for Applied Research")
+```
+
+We can see that for the above example of a player that made 51 hits, the observed salary was 70 whereas our model predicted a salary of roughtly 425. You can see it on the graph in yellow (still need to coloured). So this plot what is telling you is the differences beween the observed salary and predicted salary. Ideally we would like the red dots close to the blue line to conclude that our model predict well `salary`. But it is not the case.
+
+Another richest form of data visualization to assess your model performance is to create a scatter plots of Observed vs Fitted.You can tell pretty much everything from it. It is a scatter plot with observed values in the x-axis and fitted(or predicted) values in y-axis. We will create a plot like this and also add a diagonal line on it. Try out this code:
+
+```{r}
+
+# Create scatterplot for observed vs fitted 
+ggplot(data = baseball, aes(x = Salary, y = baseball_simple$fitted.values)) +  
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, col = "red") +
+  labs(title = "Relationship between model fits (predicted) and observed Salaries",
+       subtitle = "Simple Regression = Salary ~ Hits",
+       caption = "R course for Applied Research", y = 'Predicted (Fitted) Salary', x = 'Observed Salary') +
+  geom_segment(aes(x = Salary, y = baseball_simple$fitted.values, xend = Salary, yend = baseball_simple$fitted.values), 
+               col = "red") +
+  xlim(c(-300, 3000)) +
+  ylim(c(-300, 3000))
+```
+
+Ideally, all your points should be close to a regressed diagonal line (red). For perfect prediction, you would have fitted=observed, or x=y. So when you draw that red line through this graph above, you see how much the prediction deviated from observed value (the residuals). To some extent,in the graph, you can note that the predictions was mostly overestimating the observed outcome (predicted>observed). So, for instance taking the first row, the observed is `salary = 70`, your predicted should be reasonably close to 70 to. If the `Salary = 200`, your predicted should also be reasonably close to 200. So, just draw such a diagonal line within your graph and check out where the points lie. If your model had a high R Square, all the points would be close to this diagonal line. The lower the R Square, the weaker the Goodness of fit of your model, the more foggy or dispersed your points are (away from this diagonal line).
+
+You will see that our model seems to have clearly no relationship between the model's fitted values and Observed ones. 
+
+
+## Residual Plot
+
+Because a linear regression model is not always appropriate for the data, you should assess the appropriateness of the model by defining residuals and examining residual plots.
+
+### What are the residuals?
+The difference between the observed value of the dependent variable (y-`Salary`) and the predicted value (ŷ - `fitted values`) is called the residual (e). Each data point has one residual.
+
+Residual = Observed value - Fitted value
+
+A residual plot is a graph that shows the residuals on the vertical axis and the independent variable on the horizontal axis. If the points in a residual plot are randomly dispersed around the horizontal axis, a linear regression model is appropriate for the data; otherwise, a nonlinear model is more appropriate.
+e = y - ŷ
+
+The residual data of the simple linear regression model is the difference between the observed data and fitted values of the dependent variable. 
+
+We can create a table that contains the `y = Observed Values`, `ŷ = fitted values` and e = `residual(y-ŷ)`:
+
+```{r}
+# add the error (residuals = Observed - Fitted)
+residuals <- baseball$Salary-fitted(baseball_simple)
+
+# create residual table
+residual_table <- data.frame(Hits = baseball$Hits, Observed = baseball$Salary,Fitted = fitted(baseball_simple), residuals)
+
+# print first player predicted value and observed salary
+head(residual_table,1)
+
+```
+
+From this above table, you can see that for the first baseball player, the salary was 70 dollars (`Observed column`) and our model (`baseball_simple`) estimated a salary of 425.8066 (`Fitted` column) with an residual (`residuals`) of -355.066. Now that we grasph the concept of an the residuals let's plot the residuals and fitted values as a residual plot. Here we have our residual plot:
+
+
+```{r}
+# plot the residuals against the fitted values
+plot(baseball_simple,1)
+```
+Ideally, the residual plot will show no fitted pattern. That is, the red line should be approximately horizontal at zero. The presence of a pattern may indicate a problem with some aspect of the linear model.
+
+In our example, there is no pattern in the residual plot. This suggests that we can assume linear relationship between the *Salary* and the *Hits* variables.
+
+In overall, you have seen a simple linear regression that has confirmed a statistically significant relationship between `Salary` and `Hits`. Also, we could conclude that our model is statistically significant with a F that confirms the overall goodness of fit of our model. Indeed the analysis of the residuals also has shown no presence of linearity and thus, we might assume the appropriateness of the linear regression. Nonetheless, our model has resulted with a low R-squared which indicates that its predict ability is quite weak and we need to further investigate which other explanatory variables could be usefull to add into the model and help us to explain more amount of variance of the `Salary`.
+
+Now it is your turn:
+
+*Home Runs (HmRun) and Salary*
+In this section, we will answer the question: "Is there a relationship between the number of home runs a player scores and salary?
+
+1 Using the code below, create a scatterplot showing the relationship between `HmRun` and `Salary.` Based on this plot, what do you expect the relationship to be between `HmRun` and `Salary`?
+
+```{r}
+ggplot(baseball, aes(x = HmRun, y = Salary)) +
+  geom_point(col = "pink") +
+  geom_smooth(method='lm',  # Add linear regression line 
+              se = FALSE) # # Don't add shaded confidence region
+  labs(title = "Is there any relationship between baseball player Hits vs Salary",
+       subtitle = "Plotting your data is the first step to figuring out",
+       caption = "R course Venlo Course")
+```
+
+
+2. Conduct a regression analysis predicting a player’s `Salary` as a function of its `HmRun` value. Save the result to an object called `baseball_simple1`.
+
+```{r}
+baseball_simple1 <- lm(formula = Salary ~ HmRun, # linear regression formula (Dependent ~ Independent)
+                data = baseball) # the name of my dataset
+```
+
+
+3. Use the `summary()` function to print additional summary information from your `baseball_simple1` object.
+
+```{r}
+summary(baseball_simple1)
+```
+
+4. Interpret the quality of the model based on your `baseball_simple1` model result please.
+
+5. Using the code below, plot the relationship between the model fitted values and the observed values.
+
+```{r}
+# Create scatterplot for observed vs fitted 
+ggplot(data = baseball, aes(x = Salary, y = baseball_simple1$fitted.values)) +  
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, col = "red") +
+  labs(title = "Relationship between model fits (predicted) and observed Salaries",
+       subtitle = "Simple Regression = Salary ~ Hits",
+       caption = "R course for Applied Research", y = 'Predicted (Fitted) Salary', x = 'Observed Salary') +
+  geom_segment(aes(x = Salary, y = baseball_simple1$fitted.values, xend = Salary, yend = baseball_simple1$fitted.values), 
+               col = "red") +
+  xlim(c(-300, 3000)) +
+  ylim(c(-300, 3000))
+```
+
+
+A nice tutorial for a simple regression is here: https://www.datacamp.com/community/tutorials/linear-regression-R
+
+## Multiple Regression
+
+Multiple linear regression is an extension of simple linear regression used to predict an dependent variable (y) on the basis of multiple explanatory variables as a predictors (x).
+
+With three predictor variables (x), the prediction of y is expressed by the following equation:
+
+y = b0 + b1*x1 + b2*x2 + b3*x3
+
+
+The “b” values are called the regression weights (or beta coefficients). They measure the association between the explanatory variables and the dependent variable.
+
+In this chapter, you will learn how to:
+
+Build and interpret a multiple linear regression model in R
+Check the overall quality of the model
+
+## Building model
+
+We want to create a model for estimating the players salary based on the following variables from the baseball file:
+
+1. Hits -	Number of hits in year
+2. CWalks -	Number of walks during his career
+3. Assists - Number of assists in year
+4. Errors	- Number of errors in year
+
+To do this, use the `formula = Salary ~ Hits + CWalks + Assists + Errors ` notation. Assign the result to an object called `baseball_multiple`.Use the following guide to help you:
+
+```{r}
+baseball_multiple <- lm(formula = Salary ~ Hits + CWalks + Assists + Errors, # linear regression formula (Dependent ~ Independent)
+                data = baseball) # the name of my dataset
+```
+
+
+Again, create a summary() `baseball_multiple` in order to check its summary result:
+
+```{r}
+summary(baseball_multiple)
+```
+
+### Interpretation
+The first step in interpreting the multiple regression analysis is to examine the F-statistic and the associated p-value, at the bottom of model summary.
+
+
+In our example, it can be seen that p-value of the F-statistic is < 0.0002967, which is highly significant. This means that, at least, one of the predictor variables is significantly related to the `Salary` variable.
+
+To see which explanatory variables are significant, you can examine the coefficients table, which shows the estimate of regression beta coefficients and the associated t-statitic p-values:
+
+```{r}
+baseball_multiple$coefficients
+```
+
+For a given the predictor, the t-statistic evaluates whether or not there is significant association between the explanatory and the dependent variable, that is whether the beta coefficient of the predictor is significantly different from zero.
+
+It can be seen that, changing in Number of walks during his career (`CWalks`) are significantly associated to changes in sales while changes in newspaper budget is not significantly associated with sales. Also, `Assist` is one statistically significant variable that relates with `Salary`, albeit at 10% level of significance.
+
+As you might know, for a given explanatory variable, the coefficient (b) can be interpreted as the average effect on dependent variable (y) of a one unit increase in the explanatory variable, holding all other variables fixed.
+
+For example, making an additional 100 walk in one player carrer `CWalks` leads to an increase in salary by approximately 1.0528*100 = 105.28 dollars, on average.
+
+The `Assists` coefficient suggests that for every 1 run increase in one player career, holding all other explanatory variables constant, we can expect an increase of 0.9540434*100 = 95.40 dollars, on average.
+
+In constrast, the only negative relationship is with `Errors` in player career. Indeed, it is notoriously penalized to make errors in the Baseball League. One additional `Error` in one player career, holding all other explanatory variables contant, we can expect an decrease of -9.486*100 = -948.6.
+
+
+*p-values*
+Again, in simple terms, a p-value indicates whether or not you can reject or accept a hypothesis. The hypothesis, in this case, is that the predictor is not meaningful for your model.
+
+The p-value for `CWalks` is 0.000616. A very small value means that `CWalks` is probably an excellent addition to your model. Another variables that are statistically significant, at very least at 10% level of significance are the intercept (but not miningful to interpret it in real life) and `Assists` variable. What becomes interesting is to see how our previous variable added in one simple linear regression is now, not statistically significant. It may be possible since they might be some problem of multicolinearity (i.e. different variables that mean qualitatively the same). But this claim, needs to be further analyzed and confirmed and for now, we will not deeply investigate it here. The last variable that is also not significant is the variable `Error` with a p-value of 0.385883. In other words, there’s 38% chance that this explanatory variable is not meaningful for the regression model. 
+
+### Model accuracy assessment
+
+As we have seen in simple linear regression, the overall quality of the model can be assessed by examining the R-squared (R2) and Residual.
+
+
+
+*R-squared*:
+
+This measure is defined by the proportion of the total variability explained by the regression model.
+
+This metric can seem a little bit complicated, but in general, for models that fit the data well, R² is near 1. Models that poorly fit the data have R² near 0. In the examples below, the first one has an R² 0.3688,	 this means that the model explains only 36% of the data variability. 
+
+A problem with the R2, is that, it will always increase when more variables are added to the model, even if those variables are only weakly associated with the response. As you have seen in the simple linear regression, a solution is to adjust the R2 by taking into account the number of predictor variables.
+
+The adjustment in the “Adjusted R Square” value in the summary output is a correction for the number of x variables included in the prediction model. Thi model is perform better than the simple linear model with only `hits`, which had an adjusted R2 of 0.0382.
+
+
+*Residual*
+You can have a pretty good R² in your model, but let’s not rush to conclusions here. Let’s see in our model how they look like. Ideally, when you plot the residuals, they should look random. Otherwise means that maybe there is a hidden pattern that the linear model is not considering. To plot the residuals, use the command plot(lmTemp$residuals).
+
+
+```{r}
+plot(baseball_multiple,1)
+```
+
+Now your turn!
+
+We would like to investigate which linear equation is better at predicting a player’s `salary`:
+
+- Salary=B0+B1*`RBI`+ B2*`CAtBat` + B3*Errors
+- Salary = B0+B1*`Walks`+ B2*`CAtBat`+ B3*Errors
+
+Conduct the appropriate analysis to answer the question by completing the following steps:
+- Visualise the relationships in two separate scatterplots
+- Conduct the two separate appropriate analyse(s) using lm()
+- Print the test statistic for each coefficient
+- Compare the outputs of these two models. What do you find?

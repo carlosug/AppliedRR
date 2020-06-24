@@ -13,10 +13,11 @@ Below we list the relevant handouts/tutorials.
 
 | Lecture | Day | Description |
 |----|---|---|
-|[Lecture 1](inputs/lectures/lecture1.pdf) | 13 May 2020 | Introduction to Stats with R |
-|[Lecture 2](inputs/lectures/lecture1.pdf) | 13 June 2020 | TBD |
-|[Lecture 3](inputs/lectures/lecture1.pdf) | 15 June 2020 | TBD |
-|[Lecture 4](inputs/lectures/lecture1.pdf) | 17 June 2020 | TBD |
+|[Lecture 1](inputs/lectures/lecture1.pdf) | 13 April 2020 | Introduction to Stats with R |
+|[Lecture 2](inputs/lectures/lecture2.pdf) | 13 May 2020 | Descriptive Statistics |
+|[Lecture 3](inputs/lectures/lecture3.pdf) | 08 June 2020 | Inferential Statistics I |
+|[Lecture 4](inputs/lectures/lecture4.pdf) | 10 June 2020 | Inferential Statistics II |
+|[Lecture 5](inputs/lectures/lecture5.pdf) | 12 June 2020 | Inferential Statistics II |
 
 # R Basics
 
@@ -30,17 +31,18 @@ The chapter numbers are relevant chapters from the excellent (and freely availab
 
 | Tutorial | R4DS chapter(s) | Core packages / functions |
 |----|---|---|
-| [R Basics](inputs/Assignments-tutorial-1-sol.html) | 4 | (base R functions) |
+| [R Basics](inputs/tutorials/tutorial1.html) | 4 | (base R functions) |
 
 
 # Statistical Analysis
 
 | Tutorial | Core packages / functions |
 |----|---|
-| [Basic statistics](inputs/Assignment-2.html) | dplyr: filter, summarize |
-| [Transforming Data]() | 5 | dplyr: filter, select, arrange, mutate | 
-| [Summarizing Data]() | 5 | dplyr: group_by, summarize |
-| [Visualizing Data]() | 3 & 7 | ggplot2  |
+| [Basic statistics](inputs/tutorials/tutorial2.html) | dplyr: filter, summarize |
+| [Transforming Data](inputs/tutorials/tutorial3.html) | 5 | dplyr: filter, select, arrange, mutate | 
+| [Summarizing Data](inputs/tutorials/tutorial4.html) | 5 | dplyr: group_by, summarize |
+| [Visualizing Data](inputs/tutorials/tutorial5.html) | 3 & 7 | ggplot2  |
+| [Visualizing Data](inputs/tutorials/tutorial6.html) | 3 & 7 | ggplot2  |
 
 # Reference cards
 
