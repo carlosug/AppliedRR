@@ -1,4 +1,5 @@
-# Applied Research with R
+# Applied Research with R (year 2019-20)
+
 <img align="right" src="./pics/logoIDS.png">
 
 
@@ -8,19 +9,30 @@
 
 
 
-This repository contains a collection of R tutorials, developed at the University of Maastricht for Global Studies that use R. 
+This repository contains a collection of R tutorials, developed at the University of Maastricht for Applied Research that use R software. 
 
 The goal is to organize relevant material into modular components, for more efficient design and maintenance of material, that can be used across courses, and that are accessible to students during and after their studies.
 
 
-## How to Use this Handbook
+## Introduction
 
-The handbook is written with Python 3.5, though other Python versions (including Python 2.7) should work in nearly all cases.
+IDS aim is to teach researchers basic concepts, skills, and tools for working with data so that they can get more done in less time, and with less pain. The lessons below were designed for those interested in working with social science data in R.
 
-The book introduces the core libraries essential for working with data in Python: particularly [IPython](http://ipython.org), [NumPy](http://numpy.org), [Pandas](http://pandas.pydata.org), [Matplotlib](http://matplotlib.org), [Scikit-Learn](http://scikit-learn.org), and related packages.
+This is an introduction to R designed for participants with no programming experience. These lessons can be taught in a day (~ 8 hours). They start with some basic information about R syntax, the RStudio interface, and move through how to import  files, the structure of data frames, how to deal with factors, how to add/remove rows and columns, how to calculate summary statistics from a data frame, and a brief introduction to inferential statistics. All lessons demonstrate how to work with databases directly from R.
 
-See [Index.ipynb](https://github.com/MaastrichtU-IDS/global-studies-methods/blob/master/notebooks/Index.ipynb) for an index of the notebooks available to accompany the text.
+## Learning outcomes
 
+The curriculum for these students will be:
+
+- Introduction to R
+- Programming for Analysis
+- Git
+- Research Data Management
+- Data Transformation
+- Introduction to Exploratory Data Analysis
+- Inferential Statistics
+
+The first week of the course will be for both Early Career Reseachers (ECR’s) and Data Stewards. The second week will break into two parallel strands, one focussing on Data Science techniques for ECR’s and the other for Data Stewards.
 
 ## Lectures
 
