@@ -11,7 +11,7 @@
 
 This repository contains a collection of R tutorials, developed at the University of Maastricht for [Applied Research course](https://www.maastrichtuniversity.nl/meta/393554/applied-researcher-ii) that use R software.
 
-<img align="center" src="./pics/logo campus.jpg" width="50px" height="50px">
+<img align="center" src="./pics/logo campus.jpg">
 
 The goal is to organize relevant material into modular components, for more efficient design and maintenance of material, that can be used across courses, and that are accessible to students during and after their studies.
 
