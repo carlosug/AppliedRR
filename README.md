@@ -1,6 +1,6 @@
-# Applied Research with R (year 2019-20)
+# Applied Research with R
 
-<img align="right" src="./pics/logoIDS.png">
+<img align="center" src="./pics/logoIDS.png">
 
 
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
