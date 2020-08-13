@@ -1,6 +1,6 @@
 # Applied Research with R
 <img align="right" src="./pics/logoIDS.png">
-============
+
 
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
 [![Binder](https://mybinder.org/badge.svg)](..)
