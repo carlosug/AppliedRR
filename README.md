@@ -25,14 +25,13 @@ This is an introduction to R designed for participants with no programming exper
 The curriculum for these students will be:
 
 - Introduction to R
-- Programming for Analysis
-- Git
-- Research Data Management
-- Data Transformation
 - Introduction to Exploratory Data Analysis
+- Create graphs for exploring your data
+- Research Data Management
+- Interpret Pearson correlation and scatter plots
+- Loop functions in R
 - Inferential Statistics
 
-The first week of the course will be for both Early Career Reseachers (ECR’s) and Data Stewards. The second week will break into two parallel strands, one focussing on Data Science techniques for ECR’s and the other for Data Stewards.
 
 ## Lectures
 
