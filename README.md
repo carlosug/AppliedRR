@@ -1,15 +1,28 @@
-Applied Research with R
+# Applied Research with R
+<img align="right" src="./pics/logoIDS.png">
 ============
 
-This page contains a collection of R tutorials, developed at the University of Maastricht for Applied Research courses that use R. 
+![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
+[![Binder](https://mybinder.org/badge.svg)](..)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](..)
+
+
+
+This repository contains a collection of R tutorials, developed at the University of Maastricht for Global Studies that use R. 
 
 The goal is to organize relevant material into modular components, for more efficient design and maintenance of material, that can be used across courses, and that are accessible to students during and after their studies.
 
-Below we list the relevant handouts/tutorials.
 
-![](./pics/venlorlogo.PNG)
+## How to Use this Handbook
 
-# Lectures
+The handbook is written with Python 3.5, though other Python versions (including Python 2.7) should work in nearly all cases.
+
+The book introduces the core libraries essential for working with data in Python: particularly [IPython](http://ipython.org), [NumPy](http://numpy.org), [Pandas](http://pandas.pydata.org), [Matplotlib](http://matplotlib.org), [Scikit-Learn](http://scikit-learn.org), and related packages.
+
+See [Index.ipynb](https://github.com/MaastrichtU-IDS/global-studies-methods/blob/master/notebooks/Index.ipynb) for an index of the notebooks available to accompany the text.
+
+
+## Lectures
 
 | Lecture | Day | Description |
 |----|---|---|
@@ -19,32 +32,18 @@ Below we list the relevant handouts/tutorials.
 |[Lecture 4](inputs/lectures/lecture4.pdf) | 10 June 2020 | Inferential Statistics II |
 |[Lecture 5](inputs/lectures/lecture5.pdf) | 12 June 2020 | Inferential Statistics II |
 
-# R Basics
+## Assignments
 
-* [Getting started](tutorials/R_basics_1_getting_started.md) ([shorter version](tutorials/R_basics_1_getting_started_short.md))
-* [Data and functions](tutorials/R_basics_2_data_and_functions.md) ([practise template](practise/R_basics_2_data_and_functions_practise.Rmd))
-
-# Data mangling in the tidyverse
-
-This is a set of tutorials designed to teach using the tidyverse functions for data cleaning, reshaping, visualizing etc.
-The chapter numbers are relevant chapters from the excellent (and freely available) book ["R for Data Scientists" (R4DS)](http://r4ds.had.co.nz/)
-
-| Tutorial | R4DS chapter(s) | Core packages / functions |
+| Tutorial | Schedule | Learning Outcomes |
 |----|---|---|
-| [R Basics](inputs/tutorials/tutorial1.html) | 4 | (base R functions) |
+| [Intro to R](inputs/tutorials/Workshop1.docx) | 00:55| What are the essential compoments of R stats? |
+| [Exploratory Data Analysis](inputs/tutorials/Workshop2.docx) | 02:00 | What are the steps for Exploratory Data Analysis? | 
+| [Inferential Statistics I](inputs/tutorials/Workshop3.docx) | 03:30 | How to conduct and interpret t-test in R? |
+| [Inferential Statistics II](inputs/tutorials/Workshop4.docx) | 05:00 | How to conduct and interpret ANOVA & Chi square test?  |
+| [Inferential Statistics II](inputs/tutorials/Workshop5.docx) | 06:30| How to conduct and interpret linear & logistic regression?  |
 
 
-# Statistical Analysis
-
-| Tutorial | Core packages / functions |
-|----|---|
-| [Basic statistics](inputs/tutorials/tutorial2.html) | dplyr: filter, summarize |
-| [Transforming Data](inputs/tutorials/tutorial3.html) | 5 | dplyr: filter, select, arrange, mutate | 
-| [Summarizing Data](inputs/tutorials/tutorial4.html) | 5 | dplyr: group_by, summarize |
-| [Visualizing Data](inputs/tutorials/tutorial5.html) | 3 & 7 | ggplot2  |
-| [Visualizing Data](inputs/tutorials/tutorial6.html) | 3 & 7 | ggplot2  |
-
-# Reference cards
+## Reference cards
 
 General R Basics:
 
@@ -59,7 +58,11 @@ RStudio Guide:
 
 _Resources_: [https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/)
 
-# Where to ask?
 
-+ Google
-+ Stackoverflow community: [https://stackoverflow.com/](https://stackoverflow.com/)
+## License
+
+### Code
+The code in this repository, including all code samples in the notebooks listed above, is released under the [MIT license](LICENSE-CODE). Read more at the [Open Source Initiative](https://opensource.org/licenses/MIT).
+
+### Text
+The text content of the book is released under the [CC-BY-NC-ND license](LICENSE-TEXT). Read more at [Creative Commons](https://creativecommons.org/licenses/by-nc-nd/3.0/us/legalcode).
